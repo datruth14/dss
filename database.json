@@ -38,15 +38,6 @@
   ],
   "scans": {
     "e52f626c-56e7-4eda-8acc-faee3cf83cef": [],
-    "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b": [
-      {
-        "id": "fb898fe7-6bd9-4b3b-9fea-27a4b0e20b0a",
-        "data": "https://www.stripe.com",
-        "scannedAt": "2026-06-11T13:43:50.096Z",
-        "scannedBy": "datruth",
-        "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51",
-        "eventName": "MBTC 2026"
-      }
-    ]
+    "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b": []
   }
 }
