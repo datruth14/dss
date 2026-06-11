@@ -1,0 +1,52 @@
+{
+  "events": [
+    {
+      "id": "aa69397b-6ee7-4104-a47a-39f245759a51",
+      "name": "MBTC 2026",
+      "createdAt": "2026-06-11T13:19:23.444Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "e52f626c-56e7-4eda-8acc-faee3cf83cef",
+      "code": "490933",
+      "name": "datruth14",
+      "createdAt": "2026-06-11T12:56:59.014Z"
+    },
+    {
+      "id": "88795db7-1621-4c74-81ce-350d08874435",
+      "code": "828147",
+      "name": "datruth",
+      "createdAt": "2026-06-11T13:19:59.999Z"
+    },
+    {
+      "id": "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b",
+      "code": "327806",
+      "name": "datruth",
+      "createdAt": "2026-06-11T13:20:01.534Z"
+    }
+  ],
+  "userEvents": [
+    {
+      "userId": "88795db7-1621-4c74-81ce-350d08874435",
+      "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51"
+    },
+    {
+      "userId": "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b",
+      "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51"
+    }
+  ],
+  "scans": {
+    "e52f626c-56e7-4eda-8acc-faee3cf83cef": [],
+    "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b": [
+      {
+        "id": "fb898fe7-6bd9-4b3b-9fea-27a4b0e20b0a",
+        "data": "https://www.stripe.com",
+        "scannedAt": "2026-06-11T13:43:50.096Z",
+        "scannedBy": "datruth",
+        "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51",
+        "eventName": "MBTC 2026"
+      }
+    ]
+  }
+}
