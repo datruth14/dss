@@ -1,11 +1,5 @@
 {
-  "events": [
-    {
-      "id": "aa69397b-6ee7-4104-a47a-39f245759a51",
-      "name": "MBTC 2026",
-      "createdAt": "2026-06-11T13:19:23.444Z"
-    }
-  ],
+  "events": [],
   "users": [
     {
       "id": "e52f626c-56e7-4eda-8acc-faee3cf83cef",
@@ -26,16 +20,7 @@
       "createdAt": "2026-06-11T13:20:01.534Z"
     }
   ],
-  "userEvents": [
-    {
-      "userId": "88795db7-1621-4c74-81ce-350d08874435",
-      "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51"
-    },
-    {
-      "userId": "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b",
-      "eventId": "aa69397b-6ee7-4104-a47a-39f245759a51"
-    }
-  ],
+  "userEvents": [],
   "scans": {
     "e52f626c-56e7-4eda-8acc-faee3cf83cef": [],
     "5d8d3ded-29d8-4a46-b7c5-8c67489dda6b": []

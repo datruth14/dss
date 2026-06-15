@@ -1,1 +1,77 @@
-{"events":[],"users":[],"userEvents":[],"scans":{}}
+{
+  "events": [
+    {
+      "id": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+      "name": "ICLC",
+      "createdAt": "2026-06-11T14:01:34.106Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "c82273aa-d371-4780-8bf2-dd6416fbb44d",
+      "code": "7365",
+      "name": "Nkem",
+      "createdAt": "2026-06-11T14:01:45.363Z"
+    },
+    {
+      "id": "2cd632a3-6644-4157-a0fe-15c107ffa8df",
+      "code": "3229",
+      "name": "stella",
+      "createdAt": "2026-06-11T14:01:55.324Z"
+    }
+  ],
+  "userEvents": [
+    {
+      "userId": "c82273aa-d371-4780-8bf2-dd6416fbb44d",
+      "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2"
+    },
+    {
+      "userId": "2cd632a3-6644-4157-a0fe-15c107ffa8df",
+      "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2"
+    }
+  ],
+  "scans": {
+    "c82273aa-d371-4780-8bf2-dd6416fbb44d": [
+      {
+        "id": "237e20e8-bf90-44c9-b864-6ac9e974a504",
+        "data": "http://qrize.me/A0GXeLp",
+        "scannedAt": "2026-06-11T14:04:36.516Z",
+        "scannedBy": "Nkem",
+        "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+        "eventName": "ICLC"
+      },
+      {
+        "id": "1e49a6b1-bde7-465a-b835-9ed811a7ac56",
+        "data": "https://www.mockofun.com/",
+        "scannedAt": "2026-06-11T14:04:14.498Z",
+        "scannedBy": "Nkem",
+        "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+        "eventName": "ICLC"
+      },
+      {
+        "id": "d3c9ee39-97a2-478c-bf7b-c691e7137881",
+        "data": "http://ventipix.com",
+        "scannedAt": "2026-06-11T14:03:44.530Z",
+        "scannedBy": "Nkem",
+        "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+        "eventName": "ICLC"
+      },
+      {
+        "id": "4485d36f-8540-43ab-801b-5c51ad5061aa",
+        "data": "https://cursodeframer.com.br",
+        "scannedAt": "2026-06-11T14:03:21.920Z",
+        "scannedBy": "Nkem",
+        "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+        "eventName": "ICLC"
+      },
+      {
+        "id": "03351826-3032-4025-a4e3-b3969259f01c",
+        "data": "         (__) \n         (oo) \n   /------\\/ \n  / |    ||   \n *  /\\---/\\ \n    ~~   ~~   \n\n",
+        "scannedAt": "2026-06-11T14:03:13.607Z",
+        "scannedBy": "Nkem",
+        "eventId": "7c6106e3-e118-4699-84e7-7e5350b607b2",
+        "eventName": "ICLC"
+      }
+    ]
+  }
+}
