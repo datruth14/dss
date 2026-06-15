@@ -3,7 +3,7 @@ import path from "path";
 import { initDb, readJson, writeJson } from "@/lib/turso";
 
 const KEY = "inventify-db";
-const FS_PATH = path.join(process.cwd(), "inventify-database.json");
+const FS_PATH = path.join(process.env.VERCEL ? "/tmp" : process.cwd(), "inventify-database.json");
 const DEFAULT = { products: [], users: [], requests: [], oneSignalSubscriptions: [] };
 
 export async function GET() {

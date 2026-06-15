@@ -3,7 +3,7 @@ import path from "path";
 import { initDb, readJson, writeJson } from "@/lib/turso";
 
 const KV_KEY = "auth-scanner-db";
-const FS_PATH = path.join(process.cwd(), "auth-database.json");
+const FS_PATH = path.join(process.env.VERCEL ? "/tmp" : process.cwd(), "auth-database.json");
 
 interface DbData {
   events: any[];
