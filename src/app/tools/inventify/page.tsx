@@ -29,6 +29,8 @@ export default function InventifyPage() {
   const [newUserName, setNewUserName] = useState("");
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
 
+  useEffect(() => { initOneSignal(); }, []);
+
   const reloadDb = useCallback(async () => {
     const data = await getDb();
     setDb(data);
@@ -75,6 +77,19 @@ export default function InventifyPage() {
 
   function getAvailableProducts() {
     return products.filter((p) => p.availableCount > 0);
+  }
+
+  function initOneSignal() {
+    const s = document.createElement("script");
+    s.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+    s.defer = true;
+    s.onload = () => {
+      (window as any).OneSignalDeferred = (window as any).OneSignalDeferred || [];
+      (window as any).OneSignalDeferred.push(async function (OneSignal: any) {
+        await OneSignal.init({ appId: "ea8c73b1-463c-40e8-8bdf-2d4f18c6806c" });
+      });
+    };
+    document.head.appendChild(s);
   }
 
   const logout = () => {
@@ -148,6 +163,14 @@ export default function InventifyPage() {
   };
 
   // Requests
+  const sendNotification = async (heading: string, content: string) => {
+    await fetch("/api/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heading, content }),
+    });
+  };
+
   const submitRequest = async (product: Product) => {
     if (!currentUser) return;
     const qty = parseInt(requestQty[product.id] || "1");
@@ -160,6 +183,7 @@ export default function InventifyPage() {
     await apiPost("submitRequest", req);
     await reloadDb();
     setRequestQty((prev) => ({ ...prev, [product.id]: "" }));
+    sendNotification("New Item Request", `${currentUser.name} requested ${qty}x ${product.name}`);
   };
 
   const approveRequest = async (req: Request) => {
@@ -178,6 +202,7 @@ export default function InventifyPage() {
   const returnRequest = async (req: Request) => {
     await apiPost("updateRequest", { ...req, status: "return-pending", updatedAt: new Date().toISOString() });
     await reloadDb();
+    sendNotification("Item Return Requested", `${req.userName} wants to return ${req.quantity}x ${req.productName}`);
   };
 
   const approveReturn = async (req: Request) => {
