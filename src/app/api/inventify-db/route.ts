@@ -4,12 +4,21 @@ import { initDb, readJson, writeJson } from "@/lib/turso";
 
 const KEY = "inventify-db";
 const FS_PATH = path.join(process.env.VERCEL ? "/tmp" : process.cwd(), "inventify-database.json");
-const DEFAULT = { products: [], users: [], requests: [], oneSignalSubscriptions: [] };
+
+async function getDb(): Promise<any> {
+  const raw = await readJson(KEY, FS_PATH);
+  return {
+    products: raw.products || [],
+    users: raw.users || [],
+    requests: raw.requests || [],
+    oneSignalSubscriptions: raw.oneSignalSubscriptions || [],
+  };
+}
 
 export async function GET() {
   try {
     await initDb();
-    return NextResponse.json(await readJson(KEY, FS_PATH, DEFAULT));
+    return NextResponse.json(await getDb());
   } catch (e: any) {
     return NextResponse.json({ error: e.message || String(e), stack: e.stack }, { status: 500 });
   }
@@ -19,7 +28,7 @@ export async function POST(request: NextRequest) {
   try {
     await initDb();
     const body = await request.json();
-    const db: any = await readJson(KEY, FS_PATH, DEFAULT);
+    const db: any = await getDb();
 
     switch (body.action) {
       case "createProduct":
