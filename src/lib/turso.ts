@@ -22,14 +22,14 @@ export async function initDb() {
   );
 }
 
-export async function readJson(key: string, fsPath: string): Promise<any> {
+export async function readJson(key: string, fsPath: string, emptyDefault?: any): Promise<any> {
   const c = getClient();
   if (c) {
     const row = await c.execute("SELECT value FROM app_data WHERE key = ?", [key]);
     if (row.rows.length > 0) {
       return JSON.parse(row.rows[0].value as string);
     }
-    const empty = { events: [], users: [], userEvents: [], scans: {} };
+    const empty = emptyDefault || { events: [], users: [], userEvents: [], scans: {} };
     await c.execute("INSERT INTO app_data (key, value) VALUES (?, ?)", [
       key,
       JSON.stringify(empty),
@@ -40,7 +40,7 @@ export async function readJson(key: string, fsPath: string): Promise<any> {
     const raw = fs.readFileSync(fsPath, "utf-8");
     return JSON.parse(raw);
   } catch {
-    return { events: [], users: [], userEvents: [], scans: {} };
+    return emptyDefault || { events: [], users: [], userEvents: [], scans: {} };
   }
 }
 

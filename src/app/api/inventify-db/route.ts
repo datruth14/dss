@@ -4,16 +4,17 @@ import { initDb, readJson, writeJson } from "@/lib/turso";
 
 const KEY = "inventify-db";
 const FS_PATH = path.join(process.cwd(), "inventify-database.json");
+const DEFAULT = { products: [], users: [], requests: [], oneSignalSubscriptions: [] };
 
 export async function GET() {
   await initDb();
-  return NextResponse.json(await readJson(KEY, FS_PATH));
+  return NextResponse.json(await readJson(KEY, FS_PATH, DEFAULT));
 }
 
 export async function POST(request: NextRequest) {
   await initDb();
   const body = await request.json();
-  const db: any = await readJson(KEY, FS_PATH);
+  const db: any = await readJson(KEY, FS_PATH, DEFAULT);
 
   switch (body.action) {
     case "createProduct":
