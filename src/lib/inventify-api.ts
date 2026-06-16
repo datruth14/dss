@@ -3,6 +3,7 @@ const API = "/api/inventify-db";
 export interface Product {
   id: string;
   name: string;
+  image?: string;
   totalCount: number;
   availableCount: number;
   createdAt: string;

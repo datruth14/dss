@@ -25,7 +25,7 @@ export default function InventifyPage() {
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [productForm, setProductForm] = useState({ name: "", totalCount: "" });
+  const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
   const [newUserName, setNewUserName] = useState("");
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
 
@@ -121,17 +121,18 @@ export default function InventifyPage() {
   const saveProduct = async () => {
     const name = productForm.name.trim();
     const total = parseInt(productForm.totalCount);
+    const image = productForm.image.trim() || undefined;
     if (!name || isNaN(total) || total < 1) return;
     if (editProduct) {
-      const updated = { ...editProduct, name, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount) };
+      const updated = { ...editProduct, name, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount) };
       await apiPost("updateProduct", updated);
     } else {
-      const p: Product = { id: crypto.randomUUID(), name, totalCount: total, availableCount: total, createdAt: new Date().toISOString() };
+      const p: Product = { id: crypto.randomUUID(), name, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString() };
       await apiPost("createProduct", p);
     }
     await reloadDb();
     setEditProduct(null);
-    setProductForm({ name: "", totalCount: "" });
+    setProductForm({ name: "", image: "", totalCount: "" });
   };
 
   const deleteProduct = async (p: Product) => {
@@ -284,26 +285,33 @@ export default function InventifyPage() {
               <>
                 <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                   <h2 className="text-sm font-semibold text-zinc-300">{editProduct ? "Edit Product" : "Add Product"}</h2>
-                  <div className="mt-3 flex gap-3">
-                    <input type="text" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                      placeholder="Product name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-                    <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
-                      placeholder="Total count" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
-                    <button onClick={saveProduct} disabled={!productForm.name.trim() || !productForm.totalCount}
-                      className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
-                    {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", totalCount: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+                  <div className="mt-3 flex flex-col gap-3">
+                    <div className="flex gap-3">
+                      <input type="text" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                        placeholder="Product name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                      <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
+                        placeholder="Count" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
+                    </div>
+                    <div className="flex gap-3">
+                      <input type="text" value={productForm.image} onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                        placeholder="Image URL (optional)" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                      <button onClick={saveProduct} disabled={!productForm.name.trim() || !productForm.totalCount}
+                        className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
+                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", image: "", totalCount: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-3">
                   {products.length === 0 ? <p className="text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
                     products.map((p) => (
-                      <div key={p.id} className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-                        <div>
-                          <p className="text-sm font-semibold text-white">{p.name}</p>
+                      <div key={p.id} className="flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
+                        {p.image && <img src={p.image} alt={p.name} className="h-14 w-14 rounded-lg object-cover" />}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-white truncate">{p.name}</p>
                           <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, totalCount: String(p.totalCount) }); }} className="text-xs text-amber-400 hover:text-amber-300">Edit</button>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="text-xs text-amber-400 hover:text-amber-300">Edit</button>
                           <button onClick={() => deleteProduct(p)} className="text-xs text-red-400 hover:text-red-300">Delete</button>
                         </div>
                       </div>
@@ -419,12 +427,13 @@ export default function InventifyPage() {
               ) : (
                 <div className="space-y-3">
                   {getAvailableProducts().map((p) => (
-                    <div key={p.id} className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-                      <div>
-                        <p className="text-sm font-semibold text-white">{p.name}</p>
+                    <div key={p.id} className="flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
+                      {p.image && <img src={p.image} alt={p.name} className="h-14 w-14 rounded-lg object-cover" />}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{p.name}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} available</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <input type="number" min="1" max={p.availableCount} value={requestQty[p.id] || ""}
                           onChange={(e) => setRequestQty({ ...requestQty, [p.id]: e.target.value })}
                           placeholder="Qty" className="w-16 rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-xs text-white text-center focus:border-amber-500 focus:outline-none" />
