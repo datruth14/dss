@@ -25,6 +25,7 @@ export interface Request {
   productId: string;
   productName: string;
   quantity: number;
+  purpose?: string;
   status: "pending" | "approved" | "denied" | "return-pending" | "returned";
   requestedAt: string;
   updatedAt: string;

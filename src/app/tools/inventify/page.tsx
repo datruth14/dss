@@ -26,6 +26,8 @@ export default function InventifyPage() {
   const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
 
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
+  const [requestPurpose, setRequestPurpose] = useState<Record<string, string>>({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => { initOneSignal(); }, []);
@@ -84,6 +86,12 @@ export default function InventifyPage() {
 
   function getAvailableProducts() {
     return products.filter((p) => p.availableCount > 0);
+  }
+
+  function getFilteredProducts() {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return getAvailableProducts();
+    return getAvailableProducts().filter((p) => p.name.toLowerCase().includes(q));
   }
 
   function initOneSignal() {
@@ -216,16 +224,19 @@ export default function InventifyPage() {
   const submitRequest = async (product: Product) => {
     if (!currentUser) return;
     const qty = parseInt(requestQty[product.id] || "1");
+    const purpose = (requestPurpose[product.id] || "").trim();
     if (isNaN(qty) || qty < 1 || qty > product.availableCount) return;
+    if (!purpose) { alert("Please provide a purpose for this request."); return; }
     const req: Request = {
       id: crypto.randomUUID(), userId: currentUser.id, userName: currentUser.name,
-      productId: product.id, productName: product.name, quantity: qty,
+      productId: product.id, productName: product.name, quantity: qty, purpose,
       status: "pending", requestedAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
     };
     await apiPost("submitRequest", req);
     await reloadDb();
     setRequestQty((prev) => ({ ...prev, [product.id]: "" }));
-    sendNotification("New Item Request", `${currentUser.name} requested ${qty}x ${product.name}`);
+    setRequestPurpose((prev) => ({ ...prev, [product.id]: "" }));
+    sendNotification("New Item Request", `${currentUser.name} requested ${qty}x ${product.name} for ${purpose}`);
   };
 
   const approveRequest = async (req: Request) => {
@@ -422,6 +433,7 @@ export default function InventifyPage() {
                         <div>
                           <p className="text-sm font-semibold text-white">{req.productName}</p>
                           <p className="text-xs text-zinc-400 mt-0.5">by {req.userName} &middot; qty: {req.quantity}</p>
+                          {req.purpose && <p className="text-xs text-zinc-500 mt-0.5">Purpose: {req.purpose}</p>}
                           <p className="text-xs text-zinc-500 mt-0.5">{new Date(req.requestedAt).toLocaleDateString()}</p>
                         </div>
                         <span className={`text-xs font-medium px-2 py-1 rounded ${req.status === "pending" ? "bg-amber-900/50 text-amber-300" : "bg-amber-900/50 text-amber-300"}`}>{statusLabel(req.status)}</span>
@@ -450,6 +462,7 @@ export default function InventifyPage() {
                         <div>
                           <p className="text-sm font-semibold text-white">{req.productName} &times; {req.quantity}</p>
                           <p className="text-xs text-zinc-400 mt-0.5">{req.userName}</p>
+                          {req.purpose && <p className="text-xs text-zinc-500 mt-0.5">Purpose: {req.purpose}</p>}
                           <p className="text-xs text-zinc-500 mt-0.5">{new Date(req.updatedAt).toLocaleString()}</p>
                         </div>
                         <span className={`text-xs font-medium px-2 py-1 rounded ${
@@ -505,6 +518,7 @@ export default function InventifyPage() {
                         <div>
                           <p className="text-sm font-semibold text-white">{req.productName} &times; {req.quantity}</p>
                           <p className="text-xs text-zinc-500 mt-0.5">Approved {new Date(req.updatedAt).toLocaleDateString()}</p>
+                          {req.purpose && <p className="text-xs text-zinc-400 mt-0.5">Purpose: {req.purpose}</p>}
                         </div>
                         <button onClick={() => returnRequest(req)} className="rounded-lg border border-amber-700 px-4 py-1.5 text-xs text-amber-400 hover:bg-amber-950 transition-colors">Return</button>
                       </div>
@@ -515,11 +529,13 @@ export default function InventifyPage() {
 
               {/* Available products */}
               <h2 className="text-sm font-semibold text-zinc-300 mb-3">Available Products</h2>
-              {getAvailableProducts().length === 0 ? (
-                <p className="text-sm text-zinc-500 text-center pt-8">No products available.</p>
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..." className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+              {getFilteredProducts().length === 0 ? (
+                <p className="text-sm text-zinc-500 text-center pt-8">No products found.</p>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {getAvailableProducts().map((p) => (
+                  {getFilteredProducts().map((p) => (
                     <div key={p.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
                       <div className="aspect-[4/3] bg-zinc-800">
                         {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
@@ -530,13 +546,18 @@ export default function InventifyPage() {
                           <p className="text-sm font-semibold text-white truncate">{p.name}</p>
                           <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} available</p>
                         </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <input type="number" min="1" max={p.availableCount} value={requestQty[p.id] || ""}
-                            onChange={(e) => setRequestQty({ ...requestQty, [p.id]: e.target.value })}
-                            placeholder="Qty" className="w-full rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-white text-center focus:border-amber-500 focus:outline-none" />
-                          <button onClick={() => submitRequest(p)}
-                            disabled={!requestQty[p.id] || parseInt(requestQty[p.id]) < 1}
-                            className="shrink-0 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Request</button>
+                        <div className="mt-2 space-y-2">
+                          <input type="text" value={requestPurpose[p.id] || ""}
+                            onChange={(e) => setRequestPurpose({ ...requestPurpose, [p.id]: e.target.value })}
+                            placeholder="Purpose of request" className="w-full rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                          <div className="flex items-center gap-2">
+                            <input type="number" min="1" max={p.availableCount} value={requestQty[p.id] || ""}
+                              onChange={(e) => setRequestQty({ ...requestQty, [p.id]: e.target.value })}
+                              placeholder="Qty" className="w-full rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-white text-center focus:border-amber-500 focus:outline-none" />
+                            <button onClick={() => submitRequest(p)}
+                              disabled={!requestQty[p.id] || parseInt(requestQty[p.id]) < 1 || !requestPurpose[p.id]?.trim()}
+                              className="shrink-0 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Request</button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -553,6 +574,7 @@ export default function InventifyPage() {
                       <div>
                         <p className="text-sm font-semibold text-white">{req.productName} &times; {req.quantity}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{new Date(req.requestedAt).toLocaleString()}</p>
+                        {req.purpose && <p className="text-xs text-zinc-400 mt-0.5">Purpose: {req.purpose}</p>}
                       </div>
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         req.status === "pending" ? "bg-amber-900/50 text-amber-300" :
