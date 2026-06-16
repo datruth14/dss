@@ -15,6 +15,7 @@ export default function InventifyPage() {
   const [loginError, setLoginError] = useState(false);
   const [regName, setRegName] = useState("");
   const [regPhone, setRegPhone] = useState("");
+  const [isRegistering, setIsRegistering] = useState(true);
   const [currentUser, setCurrentUser] = useState<InventifyUser | null>(null);
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests">("dashboard");
@@ -101,28 +102,24 @@ export default function InventifyPage() {
     setCode("");
     setRegName("");
     setRegPhone("");
+    setIsRegistering(true);
   };
 
   // Auth
-  const handleLogin = () => {
-    if (loginTab === "admin") {
-      if (code === ADMIN_CODE) {
-        sessionStorage.setItem("inventify-session", JSON.stringify({ type: "admin" }));
-        setRole("admin");
-        setLoginError(false);
-      } else setLoginError(true);
-    }
+  const handleAdminLogin = () => {
+    if (code === ADMIN_CODE) {
+      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "admin" }));
+      setRole("admin");
+      setLoginError(false);
+    } else setLoginError(true);
   };
 
   const handleRegister = async () => {
     const name = regName.trim();
     const phone = regPhone.trim();
     if (!name || !phone) return;
-    const existing = inventUsers.find((u) => u.phone === phone);
-    if (existing) {
-      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: existing.id }));
-      setCurrentUser(existing);
-      setRole("user");
+    if (inventUsers.some((u) => u.phone === phone)) {
+      alert("Phone already registered. Please log in.");
       return;
     }
     const user: InventifyUser = {
@@ -133,6 +130,19 @@ export default function InventifyPage() {
     sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: user.id }));
     setCurrentUser(user);
     setRole("user");
+  };
+
+  const handleUserLogin = async () => {
+    const phone = regPhone.trim();
+    if (!phone) return;
+    const existing = inventUsers.find((u) => u.phone === phone);
+    if (existing) {
+      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: existing.id }));
+      setCurrentUser(existing);
+      setRole("user");
+    } else {
+      alert("Phone not found. Please register.");
+    }
   };
 
   // Products
@@ -247,25 +257,40 @@ export default function InventifyPage() {
                 className={`flex-1 py-3 text-sm font-medium transition-colors ${loginTab === "admin" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500"}`}>Admin</button>
             </div>
             {loginTab === "user" ? (
-              <div className="mt-6 space-y-4">
-                <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)}
-                  placeholder="Your name" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-                <input type="tel" value={regPhone} onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ""))}
-                  placeholder="Phone number" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-                <button onClick={handleRegister} disabled={!regName.trim() || !regPhone.trim()}
-                  className="w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Register / Login</button>
-              </div>
+              <>
+                <div className="mt-4 flex border-b border-zinc-800">
+                  <button onClick={() => { setIsRegistering(true); setRegName(""); setRegPhone(""); }}
+                    className={`flex-1 py-2 text-sm font-medium transition-colors ${isRegistering ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500"}`}>Register</button>
+                  <button onClick={() => { setIsRegistering(false); setRegName(""); setRegPhone(""); }}
+                    className={`flex-1 py-2 text-sm font-medium transition-colors ${!isRegistering ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500"}`}>Login</button>
+                </div>
+                <div className="mt-6 space-y-4">
+                  {isRegistering && (
+                    <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)}
+                      placeholder="Your name" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                  )}
+                  <input type="tel" value={regPhone} onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ""))}
+                    placeholder="Phone number" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                  {isRegistering ? (
+                    <button onClick={handleRegister} disabled={!regName.trim() || !regPhone.trim()}
+                      className="w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Register</button>
+                  ) : (
+                    <button onClick={handleUserLogin} disabled={!regPhone.trim()}
+                      className="w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Login</button>
+                  )}
+                </div>
+              </>
             ) : (
               <><p className="mt-4 text-sm text-zinc-400 text-center">Enter admin password</p>
               <div className="mt-4">
                 <input type="password" inputMode="numeric" maxLength={9} value={code}
                   onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setLoginError(false); }}
-                  onKeyDown={(e) => { if (e.key === "Enter" && code.length === 9) handleLogin(); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" && code.length === 9) handleAdminLogin(); }}
                   placeholder="000000000"
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-center text-2xl tracking-widest text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" autoFocus />
                 {loginError && <p className="mt-2 text-sm text-red-400 text-center">Invalid admin password</p>}
               </div>
-              <button onClick={handleLogin} disabled={code.length !== 9}
+              <button onClick={handleAdminLogin} disabled={code.length !== 9}
                 className="mt-6 w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Login</button></>
             )}
           </div>
