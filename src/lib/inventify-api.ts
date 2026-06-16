@@ -14,6 +14,7 @@ export interface InventifyUser {
   code: string;
   name: string;
   phone: string;
+  password: string;
   createdAt: string;
 }
 
