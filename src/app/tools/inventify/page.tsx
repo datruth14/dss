@@ -153,6 +153,9 @@ export default function InventifyPage() {
 
   const deleteProduct = async (p: Product) => {
     if (!confirm(`Delete "${p.name}"?`)) return;
+    if (p.image) {
+      try { await fetch("/api/cloudinary-upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: p.image }) }); } catch {}
+    }
     await apiPost("deleteProduct", p);
     await reloadDb();
   };

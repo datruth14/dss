@@ -31,3 +31,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: e.message || "Upload failed" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { url } = await request.json();
+    if (!url) return NextResponse.json({ error: "No URL" }, { status: 400 });
+
+    const parts = url.split("/");
+    const versionIdx = parts.findIndex((p: string) => p.startsWith("v") && !isNaN(Number(p.slice(1))));
+    if (versionIdx === -1 || versionIdx >= parts.length - 1) {
+      return NextResponse.json({ error: "Could not parse public ID" }, { status: 400 });
+    }
+    const publicId = parts.slice(versionIdx + 1).join("/").replace(/\.[^.]+$/, "");
+
+    await cloudinary.uploader.destroy(publicId);
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Delete failed" }, { status: 500 });
+  }
+}
