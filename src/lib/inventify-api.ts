@@ -6,6 +6,7 @@ export interface Product {
   image?: string;
   totalCount: number;
   availableCount: number;
+  assignedTo?: string;
   createdAt: string;
 }
 

@@ -20,8 +20,8 @@ export default function InventifyPage() {
   const [isRegistering, setIsRegistering] = useState(true);
   const [loginError, setLoginError] = useState("");
   const [currentUser, setCurrentUser] = useState<InventifyUser | null>(null);
-  const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history">("dashboard");
-  const [userView, setUserView] = useState<"dashboard" | "my-requests">("dashboard");
+  const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
+  const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
 
@@ -88,13 +88,17 @@ export default function InventifyPage() {
   }
 
   function getAvailableProducts() {
-    return products.filter((p) => p.availableCount > 0);
+    return products.filter((p) => p.availableCount > 0 && !p.assignedTo);
   }
 
   function getFilteredProducts() {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return getAvailableProducts();
     return getAvailableProducts().filter((p) => p.name.toLowerCase().includes(q));
+  }
+
+  function getUserAssets(uid: string) {
+    return products.filter((p) => p.assignedTo === uid);
   }
 
   function initOneSignal() {
@@ -223,6 +227,18 @@ export default function InventifyPage() {
       try { await fetch("/api/cloudinary-upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: p.image }) }); } catch {}
     }
     await apiPost("deleteProduct", p);
+    await reloadDb();
+  };
+
+  const assignProduct = async (p: Product, userId: string) => {
+    await apiPost("updateProduct", { ...p, assignedTo: userId });
+    await reloadDb();
+    const user = inventUsers.find((u) => u.id === userId);
+    if (user) sendNotification("Asset Assigned", `"${p.name}" has been assigned to you.`, userPlayerIds(userId));
+  };
+
+  const unassignProduct = async (p: Product) => {
+    await apiPost("updateProduct", { ...p, assignedTo: undefined });
     await reloadDb();
   };
 
@@ -372,7 +388,7 @@ export default function InventifyPage() {
 
           {/* Nav */}
           <div className="flex border-b border-zinc-800">
-            {(["dashboard", "products", "requests", "history"] as const).map((v) => (
+            {(["dashboard", "products", "requests", "history", "users"] as const).map((v) => (
               <button key={v} onClick={() => setAdminView(v)}
                 className={`flex-1 py-3 text-sm font-medium capitalize transition-colors ${adminView === v ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>{v}</button>
             ))}
@@ -421,27 +437,76 @@ export default function InventifyPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {products.length === 0 ? <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
-                    products.map((p) => (
-                      <div key={p.id} className="group relative flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
-                        <div className="aspect-[4/3] bg-zinc-800">
-                          {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
-                            : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
-                        </div>
-                        <div className="flex flex-1 flex-col justify-between p-3">
-                          <div>
-                            <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                            <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
+                    products.map((p) => {
+                      const assignedUser = p.assignedTo ? inventUsers.find((u) => u.id === p.assignedTo) : null;
+                      return (
+                        <div key={p.id} className="group relative flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+                          <div className="aspect-[4/3] bg-zinc-800">
+                            {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                              : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
                           </div>
-                          <div className="mt-2 flex gap-2">
-                            <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
-                            <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
+                          <div className="flex flex-1 flex-col justify-between p-3">
+                            <div>
+                              <p className="text-sm font-semibold text-white truncate">{p.name}</p>
+                              <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
+                              {assignedUser && <p className="text-xs text-amber-400 mt-0.5">Assigned to {assignedUser.name}</p>}
+                            </div>
+                            <div className="mt-2 flex flex-col gap-2">
+                              <div className="flex gap-2">
+                                <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                                <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
+                              </div>
+                              {!p.assignedTo ? (
+                                <select defaultValue="" onChange={(e) => { if (e.target.value) assignProduct(p, e.target.value); }}
+                                  className="rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-zinc-300 focus:border-amber-500 focus:outline-none">
+                                  <option value="" disabled>Assign to user...</option>
+                                  {inventUsers.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                </select>
+                              ) : (
+                                <button onClick={() => unassignProduct(p)} className="rounded-lg border border-zinc-700 py-1.5 text-xs text-zinc-400 hover:border-red-700 hover:text-red-400 transition-colors">Unassign</button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </>
+            )}
+
+            {adminView === "users" && (
+              <div className="space-y-4">
+                {inventUsers.length === 0 ? <p className="text-center text-sm text-zinc-500 pt-8">No users registered.</p> : (
+                  inventUsers.map((u) => {
+                    const userAssets = products.filter((p) => p.assignedTo === u.id);
+                    return (
+                      <div key={u.id} className="rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-white">{u.name}</p>
+                            <p className="text-xs text-zinc-500 mt-0.5">{u.phone} &middot; Joined {new Date(u.createdAt).toLocaleDateString()}</p>
+                          </div>
+                          <span className="text-xs text-zinc-400">{userAssets.length} asset{userAssets.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        {userAssets.length > 0 && (
+                          <div className="mt-3 space-y-1.5">
+                            {userAssets.map((a) => (
+                              <div key={a.id} className="flex items-center justify-between rounded-lg bg-zinc-950 px-3 py-2">
+                                <div className="flex items-center gap-2">
+                                  {a.image ? <img src={a.image} alt="" className="h-8 w-8 rounded object-cover" /> : <div className="h-8 w-8 rounded bg-zinc-800" />}
+                                  <span className="text-xs text-zinc-300">{a.name}</span>
+                                </div>
+                                <button onClick={() => unassignProduct(a)} className="text-xs text-red-400 hover:text-red-300">Remove</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             )}
 
             {adminView === "requests" && (
@@ -504,6 +569,8 @@ export default function InventifyPage() {
 
   // === USER ===
   const myRequests = currentUser ? getUserRequests(currentUser.id) : [];
+  const myAssets = currentUser ? getUserAssets(currentUser.id) : [];
+  const myAssetsCount = myAssets.length;
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-950">
@@ -520,13 +587,39 @@ export default function InventifyPage() {
 
         <div className="flex border-b border-zinc-800">
           <button onClick={() => setUserView("dashboard")}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "dashboard" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>Dashboard</button>
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "dashboard" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>Browse</button>
+          <button onClick={() => setUserView("my-assets")}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "my-assets" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>My Assets ({myAssetsCount})</button>
           <button onClick={() => setUserView("my-requests")}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "my-requests" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>My Requests ({myRequests.length})</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          {userView === "dashboard" ? (
+          {userView === "my-assets" && (
+            <>
+              <h2 className="text-sm font-semibold text-zinc-300 mb-3">My Assets</h2>
+              {myAssets.length === 0 ? (
+                <p className="text-sm text-zinc-500 text-center pt-8">No assets assigned to you yet.</p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {myAssets.map((a) => (
+                    <div key={a.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+                      <div className="aspect-[4/3] bg-zinc-800">
+                        {a.image ? <img src={a.image} alt={a.name} className="h-full w-full object-cover" />
+                          : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
+                      </div>
+                      <div className="p-3">
+                        <p className="text-sm font-semibold text-white truncate">{a.name}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">Assigned to you</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {userView === "dashboard" && (
             <>
               {/* Current requests */}
               {myRequests.filter((r) => r.status === "approved").length > 0 && (
@@ -585,7 +678,9 @@ export default function InventifyPage() {
                 </div>
               )}
             </>
-          ) : (
+          )}
+
+          {userView === "my-requests" && (
             <div className="space-y-3">
               {myRequests.length === 0 ? <p className="text-center text-sm text-zinc-500 pt-8">No requests yet.</p> : (
                 myRequests.map((req) => (
