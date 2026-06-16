@@ -317,7 +317,7 @@ export default function InventifyPage() {
                       </label>
                       {productForm.image && (
                         <div className="relative shrink-0">
-                          <img src={productForm.image} alt="" className="h-10 w-10 rounded object-cover" />
+                          <img src={productForm.image} alt="" className="h-14 w-14 rounded-lg object-cover" />
                           <button onClick={() => setProductForm((p) => ({ ...p, image: "" }))} className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white hover:bg-red-500">x</button>
                         </div>
                       )}
@@ -327,18 +327,23 @@ export default function InventifyPage() {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  {products.length === 0 ? <p className="text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
+                <div className="grid grid-cols-2 gap-4">
+                  {products.length === 0 ? <p className="col-span-2 text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
                     products.map((p) => (
-                      <div key={p.id} className="flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-                        {p.image && <img src={p.image} alt={p.name} className="h-14 w-14 rounded-lg object-cover" />}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                          <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
+                      <div key={p.id} className="group relative flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+                        <div className="aspect-[4/3] bg-zinc-800">
+                          {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                            : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
                         </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="text-xs text-amber-400 hover:text-amber-300">Edit</button>
-                          <button onClick={() => deleteProduct(p)} className="text-xs text-red-400 hover:text-red-300">Delete</button>
+                        <div className="flex flex-1 flex-col justify-between p-3">
+                          <div>
+                            <p className="text-sm font-semibold text-white truncate">{p.name}</p>
+                            <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
+                          </div>
+                          <div className="mt-2 flex gap-2">
+                            <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                            <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
+                          </div>
                         </div>
                       </div>
                     ))
@@ -451,21 +456,26 @@ export default function InventifyPage() {
               {getAvailableProducts().length === 0 ? (
                 <p className="text-sm text-zinc-500 text-center pt-8">No products available.</p>
               ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-4">
                   {getAvailableProducts().map((p) => (
-                    <div key={p.id} className="flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-                      {p.image && <img src={p.image} alt={p.name} className="h-14 w-14 rounded-lg object-cover" />}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                        <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} available</p>
+                    <div key={p.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+                      <div className="aspect-[4/3] bg-zinc-800">
+                        {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                          : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <input type="number" min="1" max={p.availableCount} value={requestQty[p.id] || ""}
-                          onChange={(e) => setRequestQty({ ...requestQty, [p.id]: e.target.value })}
-                          placeholder="Qty" className="w-16 rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-xs text-white text-center focus:border-amber-500 focus:outline-none" />
-                        <button onClick={() => submitRequest(p)}
-                          disabled={!requestQty[p.id] || parseInt(requestQty[p.id]) < 1}
-                          className="rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Request</button>
+                      <div className="flex flex-1 flex-col justify-between p-3">
+                        <div>
+                          <p className="text-sm font-semibold text-white truncate">{p.name}</p>
+                          <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} available</p>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input type="number" min="1" max={p.availableCount} value={requestQty[p.id] || ""}
+                            onChange={(e) => setRequestQty({ ...requestQty, [p.id]: e.target.value })}
+                            placeholder="Qty" className="w-full rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-white text-center focus:border-amber-500 focus:outline-none" />
+                          <button onClick={() => submitRequest(p)}
+                            disabled={!requestQty[p.id] || parseInt(requestQty[p.id]) < 1}
+                            className="shrink-0 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Request</button>
+                        </div>
                       </div>
                     </div>
                   ))}
