@@ -28,6 +28,7 @@ export default function InventifyPage() {
   const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
   const [newUserName, setNewUserName] = useState("");
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => { initOneSignal(); }, []);
 
@@ -118,6 +119,21 @@ export default function InventifyPage() {
   };
 
   // Products
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch("/api/cloudinary-upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) setProductForm((prev) => ({ ...prev, image: data.url }));
+    } catch {
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const saveProduct = async () => {
     const name = productForm.name.trim();
     const total = parseInt(productForm.totalCount);
@@ -292,9 +308,19 @@ export default function InventifyPage() {
                       <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
                         placeholder="Count" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                     </div>
-                    <div className="flex gap-3">
-                      <input type="text" value={productForm.image} onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                        placeholder="Image URL (optional)" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                    <div className="flex gap-3 items-center">
+                      <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
+                        <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span className="truncate">{uploading ? "Uploading..." : productForm.image ? "Change image" : "Upload image"}</span>
+                        <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                          onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} />
+                      </label>
+                      {productForm.image && (
+                        <div className="relative shrink-0">
+                          <img src={productForm.image} alt="" className="h-10 w-10 rounded object-cover" />
+                          <button onClick={() => setProductForm((p) => ({ ...p, image: "" }))} className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white hover:bg-red-500">x</button>
+                        </div>
+                      )}
                       <button onClick={saveProduct} disabled={!productForm.name.trim() || !productForm.totalCount}
                         className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
                       {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", image: "", totalCount: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
