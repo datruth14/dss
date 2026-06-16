@@ -6,14 +6,6 @@ import type { Product, InventifyUser, Request, DbData } from "@/lib/inventify-ap
 
 const ADMIN_CODE = "123456789";
 
-function generateCode(existing: string[]): string {
-  let code: string;
-  do {
-    code = String(Math.floor(1000 + Math.random() * 9000));
-  } while (existing.includes(code));
-  return code;
-}
-
 export default function InventifyPage() {
   const [db, setDb] = useState<DbData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,12 +13,14 @@ export default function InventifyPage() {
   const [loginTab, setLoginTab] = useState<"admin" | "user">("user");
   const [code, setCode] = useState("");
   const [loginError, setLoginError] = useState(false);
+  const [regName, setRegName] = useState("");
+  const [regPhone, setRegPhone] = useState("");
   const [currentUser, setCurrentUser] = useState<InventifyUser | null>(null);
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
-  const [newUserName, setNewUserName] = useState("");
+
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
 
@@ -60,6 +54,14 @@ export default function InventifyPage() {
   const inventUsers = db?.users || [];
   const requests = db?.requests || [];
 
+  function statusLabel(s: string) {
+    const map: Record<string, string> = {
+      "pending": "Pending", "approved": "Approved", "denied": "Denied",
+      "return-pending": "Returned unconfirmed", "returned": "Returned confirmed",
+    };
+    return map[s] || s;
+  }
+
   function getUserRequests(uid: string) {
     return requests.filter((r) => r.userId === uid).sort(
       (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
@@ -72,7 +74,7 @@ export default function InventifyPage() {
   }
 
   function getHistory() {
-    return requests.filter((r) => r.status === "approved" || r.status === "denied" || r.status === "returned")
+    return requests.filter((r) => r.status === "approved" || r.status === "denied" || r.status === "returned" || r.status === "return-pending")
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }
 
@@ -97,6 +99,8 @@ export default function InventifyPage() {
     sessionStorage.removeItem("inventify-session");
     setRole("login");
     setCode("");
+    setRegName("");
+    setRegPhone("");
   };
 
   // Auth
@@ -107,15 +111,28 @@ export default function InventifyPage() {
         setRole("admin");
         setLoginError(false);
       } else setLoginError(true);
-    } else {
-      const user = inventUsers.find((u) => u.code === code);
-      if (user) {
-        sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: user.id }));
-        setCurrentUser(user);
-        setRole("user");
-        setLoginError(false);
-      } else setLoginError(true);
     }
+  };
+
+  const handleRegister = async () => {
+    const name = regName.trim();
+    const phone = regPhone.trim();
+    if (!name || !phone) return;
+    const existing = inventUsers.find((u) => u.phone === phone);
+    if (existing) {
+      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: existing.id }));
+      setCurrentUser(existing);
+      setRole("user");
+      return;
+    }
+    const user: InventifyUser = {
+      id: crypto.randomUUID(), code: phone.slice(-4), name, phone, createdAt: new Date().toISOString(),
+    };
+    await apiPost("createUser", user);
+    await reloadDb();
+    sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: user.id }));
+    setCurrentUser(user);
+    setRole("user");
   };
 
   // Products
@@ -157,28 +174,6 @@ export default function InventifyPage() {
       try { await fetch("/api/cloudinary-upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: p.image }) }); } catch {}
     }
     await apiPost("deleteProduct", p);
-    await reloadDb();
-  };
-
-  // Users
-  const createUser = async () => {
-    const name = newUserName.trim();
-    if (!name) return;
-    if (inventUsers.some((u) => u.name.toLowerCase() === name.toLowerCase())) {
-      alert("User already exists."); return;
-    }
-    const user: InventifyUser = {
-      id: crypto.randomUUID(), code: generateCode(inventUsers.map((u) => u.code)),
-      name, createdAt: new Date().toISOString(),
-    };
-    await apiPost("createUser", user);
-    await reloadDb();
-    setNewUserName("");
-  };
-
-  const deleteUser = async (u: InventifyUser) => {
-    if (!confirm(`Delete user "${u.name}"?`)) return;
-    await apiPost("deleteUser", u);
     await reloadDb();
   };
 
@@ -251,17 +246,28 @@ export default function InventifyPage() {
               <button onClick={() => { setLoginTab("admin"); setCode(""); setLoginError(false); }}
                 className={`flex-1 py-3 text-sm font-medium transition-colors ${loginTab === "admin" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500"}`}>Admin</button>
             </div>
-            <p className="mt-4 text-sm text-zinc-400 text-center">{loginTab === "user" ? "Enter your 4-digit code" : "Enter admin password"}</p>
-            <div className="mt-4">
-              <input type="password" inputMode="numeric" maxLength={loginTab === "admin" ? 9 : 4} value={code}
-                onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setLoginError(false); }}
-                onKeyDown={(e) => { const len = loginTab === "admin" ? 9 : 4; if (e.key === "Enter" && code.length === len) handleLogin(); }}
-                placeholder={loginTab === "admin" ? "000000000" : "0000"}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-center text-2xl tracking-widest text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" autoFocus />
-              {loginError && <p className="mt-2 text-sm text-red-400 text-center">{loginTab === "admin" ? "Invalid admin password" : "Code not recognised"}</p>}
-            </div>
-            <button onClick={handleLogin} disabled={code.length !== (loginTab === "admin" ? 9 : 4)}
-              className="mt-6 w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Login</button>
+            {loginTab === "user" ? (
+              <div className="mt-6 space-y-4">
+                <input type="text" value={regName} onChange={(e) => setRegName(e.target.value)}
+                  placeholder="Your name" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                <input type="tel" value={regPhone} onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ""))}
+                  placeholder="Phone number" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                <button onClick={handleRegister} disabled={!regName.trim() || !regPhone.trim()}
+                  className="w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Register / Login</button>
+              </div>
+            ) : (
+              <><p className="mt-4 text-sm text-zinc-400 text-center">Enter admin password</p>
+              <div className="mt-4">
+                <input type="password" inputMode="numeric" maxLength={9} value={code}
+                  onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setLoginError(false); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" && code.length === 9) handleLogin(); }}
+                  placeholder="000000000"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-center text-2xl tracking-widest text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" autoFocus />
+                {loginError && <p className="mt-2 text-sm text-red-400 text-center">Invalid admin password</p>}
+              </div>
+              <button onClick={handleLogin} disabled={code.length !== 9}
+                className="mt-6 w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Login</button></>
+            )}
           </div>
         </div>
       </div>
@@ -366,7 +372,7 @@ export default function InventifyPage() {
                           <p className="text-xs text-zinc-400 mt-0.5">by {req.userName} &middot; qty: {req.quantity}</p>
                           <p className="text-xs text-zinc-500 mt-0.5">{new Date(req.requestedAt).toLocaleDateString()}</p>
                         </div>
-                        <span className={`text-xs font-medium px-2 py-1 rounded ${req.status === "pending" ? "bg-amber-900/50 text-amber-300" : "bg-blue-900/50 text-blue-300"}`}>{req.status === "return-pending" ? "Return Requested" : "Pending"}</span>
+                        <span className={`text-xs font-medium px-2 py-1 rounded ${req.status === "pending" ? "bg-amber-900/50 text-amber-300" : "bg-amber-900/50 text-amber-300"}`}>{statusLabel(req.status)}</span>
                       </div>
                       <div className="mt-3 flex gap-2">
                         {req.status === "pending" && (
@@ -396,8 +402,9 @@ export default function InventifyPage() {
                         </div>
                         <span className={`text-xs font-medium px-2 py-1 rounded ${
                           req.status === "approved" ? "bg-emerald-900/50 text-emerald-300" :
-                          req.status === "returned" ? "bg-blue-900/50 text-blue-300" : "bg-red-900/50 text-red-300"
-                        }`}>{req.status}</span>
+                          req.status === "returned" ? "bg-blue-900/50 text-blue-300" :
+                          req.status === "return-pending" ? "bg-amber-900/50 text-amber-300" : "bg-red-900/50 text-red-300"
+                        }`}>{statusLabel(req.status)}</span>
                       </div>
                     </div>
                   ))
@@ -499,8 +506,8 @@ export default function InventifyPage() {
                         req.status === "pending" ? "bg-amber-900/50 text-amber-300" :
                         req.status === "approved" ? "bg-emerald-900/50 text-emerald-300" :
                         req.status === "denied" ? "bg-red-900/50 text-red-300" :
-                        req.status === "return-pending" ? "bg-blue-900/50 text-blue-300" : "bg-zinc-800 text-zinc-400"
-                      }`}>{req.status.replace("-", " ")}</span>
+                        req.status === "return-pending" ? "bg-amber-900/50 text-amber-300" : "bg-blue-900/50 text-blue-300"
+                      }`}>{statusLabel(req.status)}</span>
                     </div>
                     {(req.status === "approved") && (
                       <div className="mt-3">

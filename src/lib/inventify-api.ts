@@ -13,6 +13,7 @@ export interface InventifyUser {
   id: string;
   code: string;
   name: string;
+  phone: string;
   createdAt: string;
 }
 
