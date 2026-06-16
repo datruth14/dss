@@ -29,8 +29,11 @@ export default function InventifyPage() {
   const [requestPurpose, setRequestPurpose] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [userPlayerId, setUserPlayerId] = useState<string | null>(null);
 
   useEffect(() => { initOneSignal(); }, []);
+
+  useEffect(() => { if (userPlayerId && (role === "admin" || role === "user")) subscribePlayer(); }, [userPlayerId, role]);
 
   const reloadDb = useCallback(async () => {
     const data = await getDb();
@@ -102,10 +105,21 @@ export default function InventifyPage() {
       (window as any).OneSignalDeferred = (window as any).OneSignalDeferred || [];
       (window as any).OneSignalDeferred.push(async function (OneSignal: any) {
         await OneSignal.init({ appId: "ea8c73b1-463c-40e8-8bdf-2d4f18c6806c" });
+        const pid = await OneSignal.getUserId();
+        if (pid) setUserPlayerId(pid);
       });
     };
     document.head.appendChild(s);
   }
+
+  const subscribePlayer = async () => {
+    if (!userPlayerId) return;
+    if (role === "admin") {
+      await apiPost("saveSubscription", { id: "admin", playerId: userPlayerId, role: "admin" });
+    } else if (currentUser) {
+      await apiPost("saveSubscription", { id: currentUser.id, playerId: userPlayerId, role: "user" });
+    }
+  };
 
   const logout = () => {
     sessionStorage.removeItem("inventify-session");
@@ -213,13 +227,16 @@ export default function InventifyPage() {
   };
 
   // Requests
-  const sendNotification = async (heading: string, content: string) => {
+  const sendNotification = async (heading: string, content: string, playerIds?: string[]) => {
     await fetch("/api/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ heading, content }),
+      body: JSON.stringify({ heading, content, playerIds }),
     });
   };
+
+  const userPlayerIds = (userId: string) =>
+    db?.oneSignalSubscriptions?.filter((s) => s.id === userId).map((s) => s.playerId) || [];
 
   const submitRequest = async (product: Product) => {
     if (!currentUser) return;
@@ -245,11 +262,13 @@ export default function InventifyPage() {
     await apiPost("updateProduct", { ...product, availableCount: product.availableCount - req.quantity });
     await apiPost("updateRequest", { ...req, status: "approved", updatedAt: new Date().toISOString() });
     await reloadDb();
+    sendNotification("Request Approved", `Your request for ${req.quantity}x ${req.productName} has been approved.`, userPlayerIds(req.userId));
   };
 
   const denyRequest = async (req: Request) => {
     await apiPost("updateRequest", { ...req, status: "denied", updatedAt: new Date().toISOString() });
     await reloadDb();
+    sendNotification("Request Denied", `Your request for ${req.quantity}x ${req.productName} has been denied.`, userPlayerIds(req.userId));
   };
 
   const returnRequest = async (req: Request) => {
@@ -265,6 +284,7 @@ export default function InventifyPage() {
     }
     await apiPost("updateRequest", { ...req, status: "returned", updatedAt: new Date().toISOString() });
     await reloadDb();
+    sendNotification("Return Confirmed", `Your return of ${req.quantity}x ${req.productName} has been confirmed.`, userPlayerIds(req.userId));
   };
 
   // ---- Render ----
