@@ -45,6 +45,12 @@ export default function InventifyPage() {
   }, []);
 
   useEffect(() => {
+    if (role !== "admin" && role !== "user") return;
+    const id = setInterval(() => reloadDb(), 5000);
+    return () => clearInterval(id);
+  }, [role, reloadDb]);
+
+  useEffect(() => {
     reloadDb().then((data) => {
       const raw = localStorage.getItem("inventify-session");
       if (raw) {
