@@ -58,6 +58,13 @@ export async function POST(request: NextRequest) {
         await writeJson(KEY, FS_PATH, db);
         return NextResponse.json({ ok: true });
 
+      case "updateUser":
+        db.users = db.users.map((u: any) =>
+          u.id === body.data.id ? body.data : u
+        );
+        await writeJson(KEY, FS_PATH, db);
+        return NextResponse.json({ ok: true });
+
       case "submitRequest":
         db.requests.push(body.data);
         await writeJson(KEY, FS_PATH, db);

@@ -30,6 +30,7 @@ export default function InventifyPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [uploading, setUploading] = useState(false);
   const [userPlayerId, setUserPlayerId] = useState<string | null>(null);
+  const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
 
   useEffect(() => { initOneSignal(); }, []);
 
@@ -235,6 +236,14 @@ export default function InventifyPage() {
     await reloadDb();
     const user = inventUsers.find((u) => u.id === userId);
     if (user) sendNotification("Asset Assigned", `"${p.name}" has been assigned to you.`, userPlayerIds(userId));
+  };
+
+  const resetPassword = async (u: InventifyUser) => {
+    const pw = newPasswords[u.id]?.trim();
+    if (!pw || !confirm(`Reset password for ${u.name}?`)) return;
+    await apiPost("updateUser", { ...u, password: pw });
+    await reloadDb();
+    setNewPasswords((prev) => ({ ...prev, [u.id]: "" }));
   };
 
   const unassignProduct = async (p: Product) => {
@@ -482,27 +491,40 @@ export default function InventifyPage() {
                     const userAssets = products.filter((p) => p.assignedTo === u.id);
                     return (
                       <div key={u.id} className="rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-semibold text-white">{u.name}</p>
-                            <p className="text-xs text-zinc-500 mt-0.5">{u.phone} &middot; Joined {new Date(u.createdAt).toLocaleDateString()}</p>
-                          </div>
-                          <span className="text-xs text-zinc-400">{userAssets.length} asset{userAssets.length !== 1 ? "s" : ""}</span>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-white">{u.name}</p>
+                          <p className="text-xs text-zinc-500 mt-0.5">{u.phone} &middot; Joined {new Date(u.createdAt).toLocaleDateString()}</p>
                         </div>
-                        {userAssets.length > 0 && (
-                          <div className="mt-3 space-y-1.5">
-                            {userAssets.map((a) => (
-                              <div key={a.id} className="flex items-center justify-between rounded-lg bg-zinc-950 px-3 py-2">
-                                <div className="flex items-center gap-2">
-                                  {a.image ? <img src={a.image} alt="" className="h-8 w-8 rounded object-cover" /> : <div className="h-8 w-8 rounded bg-zinc-800" />}
-                                  <span className="text-xs text-zinc-300">{a.name}</span>
-                                </div>
-                                <button onClick={() => unassignProduct(a)} className="text-xs text-red-400 hover:text-red-300">Remove</button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        <span className="text-xs text-zinc-400">{userAssets.length} asset{userAssets.length !== 1 ? "s" : ""}</span>
                       </div>
+                      {userAssets.length > 0 && (
+                        <div className="mt-3 space-y-1.5">
+                          {userAssets.map((a) => (
+                            <div key={a.id} className="flex items-center justify-between rounded-lg bg-zinc-950 px-3 py-2">
+                              <div className="flex items-center gap-2">
+                                {a.image ? <img src={a.image} alt="" className="h-8 w-8 rounded object-cover" /> : <div className="h-8 w-8 rounded bg-zinc-800" />}
+                                <span className="text-xs text-zinc-300">{a.name}</span>
+                              </div>
+                              <button onClick={() => unassignProduct(a)} className="text-xs text-red-400 hover:text-red-300">Remove</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <select defaultValue="" onChange={(e) => { if (e.target.value) assignProduct(products.find((p) => p.id === e.target.value)!, u.id); }}
+                          className="flex-1 min-w-0 rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-zinc-300 focus:border-amber-500 focus:outline-none">
+                          <option value="" disabled>Assign asset...</option>
+                          {products.filter((p) => !p.assignedTo).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                        <input type="password" value={newPasswords[u.id] || ""}
+                          onChange={(e) => setNewPasswords({ ...newPasswords, [u.id]: e.target.value })}
+                          placeholder="New password"
+                          className="flex-1 min-w-0 rounded-lg border border-zinc-700 bg-black px-2 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                        <button onClick={() => resetPassword(u)}
+                          className="rounded-lg border border-zinc-700 px-2 py-1.5 text-xs text-zinc-400 hover:border-amber-700 hover:text-amber-400 transition-colors whitespace-nowrap">Reset PW</button>
+                      </div>
+                    </div>
                     );
                   })
                 )}
