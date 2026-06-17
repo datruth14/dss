@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
 
   const body: Record<string, any> = {
     app_id: appId,
+    app_url: "https://dss-orpin.vercel.app/tools/inventify/",
     headings: { en: heading },
     contents: { en: content },
   };
