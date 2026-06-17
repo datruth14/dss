@@ -21,7 +21,7 @@ export default function InventifyPage() {
   const [loginError, setLoginError] = useState("");
   const [currentUser, setCurrentUser] = useState<InventifyUser | null>(null);
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
-  const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets">("dashboard");
+  const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets" | "profile">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
 
@@ -31,6 +31,8 @@ export default function InventifyPage() {
   const [uploading, setUploading] = useState(false);
   const [userPlayerId, setUserPlayerId] = useState<string | null>(null);
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
+  const [profileName, setProfileName] = useState("");
+  const [profilePassword, setProfilePassword] = useState("");
 
   useEffect(() => { initOneSignal(); }, []);
 
@@ -310,6 +312,22 @@ export default function InventifyPage() {
     await apiPost("updateRequest", { ...req, status: "returned", updatedAt: new Date().toISOString() });
     await reloadDb();
     sendNotification("Return Confirmed", `Your return of ${req.quantity}x ${req.productName} has been confirmed.`, userPlayerIds(req.userId));
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!currentUser) return;
+    const name = profileName.trim();
+    const password = profilePassword.trim();
+    if (!name && !password) return;
+    const updated = { ...currentUser };
+    if (name) updated.name = name;
+    if (password) updated.password = password;
+    await apiPost("updateUser", updated);
+    await reloadDb();
+    localStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: updated.id }));
+    setCurrentUser(updated);
+    setProfileName("");
+    setProfilePassword("");
   };
 
   // ---- Render ----
@@ -614,6 +632,8 @@ export default function InventifyPage() {
             className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "my-assets" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>My Assets ({myAssetsCount})</button>
           <button onClick={() => setUserView("my-requests")}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "my-requests" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>My Requests ({myRequests.length})</button>
+          <button onClick={() => setUserView("profile")}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${userView === "profile" ? "border-b-2 border-amber-500 text-amber-400" : "text-zinc-500 hover:text-zinc-300"}`}>Profile</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -728,6 +748,17 @@ export default function InventifyPage() {
                   </div>
                 ))
               )}
+            </div>
+          )}
+          {userView === "profile" && (
+            <div className="max-w-sm mx-auto space-y-4 pt-4">
+              <h2 className="text-sm font-semibold text-zinc-300">Update Profile</h2>
+              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)}
+                placeholder={currentUser?.name || "New name"} className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+              <input type="password" value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)}
+                placeholder="New password" className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+              <button onClick={handleUpdateProfile} disabled={!profileName.trim() && !profilePassword.trim()}
+                className="w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Save Changes</button>
             </div>
           )}
         </div>
