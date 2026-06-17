@@ -97,7 +97,7 @@ export default function InventifyPage() {
   }
 
   function getAvailableProducts() {
-    return products.filter((p) => p.availableCount > 0 && !p.assignedTo);
+    return products.filter((p) => p.availableCount > 0);
   }
 
   function getFilteredProducts() {
