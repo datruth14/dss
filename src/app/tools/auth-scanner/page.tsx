@@ -71,7 +71,7 @@ export default function AuthScannerPage() {
 
   useEffect(() => {
     reloadDb().then((data) => {
-      const raw = sessionStorage.getItem("auth-scanner-session");
+      const raw = localStorage.getItem("auth-scanner-session");
       if (raw) {
         try {
           const session = JSON.parse(raw);
@@ -89,11 +89,11 @@ export default function AuthScannerPage() {
               setScans(data.scans?.[user.id] || []);
               setRole("scanner");
             } else {
-              sessionStorage.removeItem("auth-scanner-session");
+              localStorage.removeItem("auth-scanner-session");
             }
           }
         } catch {
-          sessionStorage.removeItem("auth-scanner-session");
+          localStorage.removeItem("auth-scanner-session");
         }
       }
     }).finally(() => setLoading(false));
@@ -134,7 +134,7 @@ export default function AuthScannerPage() {
   const handleLogin = () => {
     if (loginTab === "admin") {
       if (code === ADMIN_CODE) {
-        sessionStorage.setItem("auth-scanner-session", JSON.stringify({ type: "admin" }));
+        localStorage.setItem("auth-scanner-session", JSON.stringify({ type: "admin" }));
         setRole("admin");
         setLoginError(false);
       } else {
@@ -147,7 +147,7 @@ export default function AuthScannerPage() {
       }
       const user = getUserByCode(code);
       if (user && isUserAssignedToEvent(user.id, selectedLoginEvent.id)) {
-        sessionStorage.setItem(
+        localStorage.setItem(
           "auth-scanner-session",
           JSON.stringify({ type: "scanner", userId: user.id, eventId: selectedLoginEvent.id })
         );
@@ -185,7 +185,7 @@ export default function AuthScannerPage() {
   };
 
   const logout = () => {
-    sessionStorage.removeItem("auth-scanner-session");
+    localStorage.removeItem("auth-scanner-session");
     setRole("login");
     setCode("");
     stopScanner();

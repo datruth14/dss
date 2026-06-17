@@ -44,7 +44,7 @@ export default function InventifyPage() {
 
   useEffect(() => {
     reloadDb().then((data) => {
-      const raw = sessionStorage.getItem("inventify-session");
+      const raw = localStorage.getItem("inventify-session");
       if (raw) {
         try {
           const s = JSON.parse(raw);
@@ -52,9 +52,9 @@ export default function InventifyPage() {
           else if (s.type === "user") {
             const u = data.users.find((x: InventifyUser) => x.id === s.userId);
             if (u) { setCurrentUser(u); setRole("user"); }
-            else sessionStorage.removeItem("inventify-session");
+            else localStorage.removeItem("inventify-session");
           }
-        } catch { sessionStorage.removeItem("inventify-session"); }
+        } catch { localStorage.removeItem("inventify-session"); }
       }
     }).finally(() => setLoading(false));
   }, [reloadDb]);
@@ -127,7 +127,7 @@ export default function InventifyPage() {
   };
 
   const logout = () => {
-    sessionStorage.removeItem("inventify-session");
+    localStorage.removeItem("inventify-session");
     setRole("login");
     setCode("");
     setRegName("");
@@ -142,7 +142,7 @@ export default function InventifyPage() {
   // Auth
   const handleAdminLogin = () => {
     if (code === ADMIN_CODE) {
-      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "admin" }));
+      localStorage.setItem("inventify-session", JSON.stringify({ type: "admin" }));
       setRole("admin");
       setLoginError("");
     } else setLoginError("Invalid admin password");
@@ -166,7 +166,7 @@ export default function InventifyPage() {
     };
     await apiPost("createUser", user);
     await reloadDb();
-    sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: user.id }));
+    localStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: user.id }));
     setCurrentUser(user);
     setRole("user");
   };
@@ -181,7 +181,7 @@ export default function InventifyPage() {
         setLoginError("Incorrect password.");
         return;
       }
-      sessionStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: existing.id }));
+      localStorage.setItem("inventify-session", JSON.stringify({ type: "user", userId: existing.id }));
       setCurrentUser(existing);
       setRole("user");
     } else {

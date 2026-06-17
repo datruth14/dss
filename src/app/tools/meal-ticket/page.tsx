@@ -71,7 +71,7 @@ export default function MealTicketPage() {
 
   useEffect(() => {
     reloadDb().then((data) => {
-      const raw = sessionStorage.getItem("meal-ticket-session");
+      const raw = localStorage.getItem("meal-ticket-session");
       if (raw) {
         try {
           const session = JSON.parse(raw);
@@ -89,11 +89,11 @@ export default function MealTicketPage() {
               setScans(data.scans?.[user.id] || []);
               setRole("scanner");
             } else {
-              sessionStorage.removeItem("meal-ticket-session");
+              localStorage.removeItem("meal-ticket-session");
             }
           }
         } catch {
-          sessionStorage.removeItem("meal-ticket-session");
+          localStorage.removeItem("meal-ticket-session");
         }
       }
     }).finally(() => setLoading(false));
@@ -134,7 +134,7 @@ export default function MealTicketPage() {
   const handleLogin = () => {
     if (loginTab === "admin") {
       if (code === ADMIN_CODE) {
-        sessionStorage.setItem("meal-ticket-session", JSON.stringify({ type: "admin" }));
+        localStorage.setItem("meal-ticket-session", JSON.stringify({ type: "admin" }));
         setRole("admin");
         setLoginError(false);
       } else {
@@ -147,7 +147,7 @@ export default function MealTicketPage() {
       }
       const user = getUserByCode(code);
       if (user && isUserAssignedToEvent(user.id, selectedLoginEvent.id)) {
-        sessionStorage.setItem(
+        localStorage.setItem(
           "meal-ticket-session",
           JSON.stringify({ type: "scanner", userId: user.id, eventId: selectedLoginEvent.id })
         );
@@ -170,7 +170,7 @@ export default function MealTicketPage() {
   };
 
   const logout = () => {
-    sessionStorage.removeItem("meal-ticket-session");
+    localStorage.removeItem("meal-ticket-session");
     setRole("login");
     setCode("");
     stopScanner();
