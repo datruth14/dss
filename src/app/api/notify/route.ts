@@ -10,9 +10,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: "OneSignal not configured" });
   }
 
+  const url = "https://dss-orpin.vercel.app/tools/inventify/";
+
   const body: Record<string, any> = {
     app_id: appId,
-    app_url: "https://dss-orpin.vercel.app/tools/inventify/",
+    url,
+    web_url: url,
     headings: { en: heading },
     contents: { en: content },
   };
