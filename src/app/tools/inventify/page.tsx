@@ -614,8 +614,6 @@ export default function InventifyPage() {
                         </div>
                       );
                     })
-                      );
-                    });
                   })()}
                 </div>
                 {(() => {
