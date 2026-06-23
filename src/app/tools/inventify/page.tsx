@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getDb, apiPost } from "@/lib/inventify-api";
 import type { Product, InventifyUser, Request, DbData, Category } from "@/lib/inventify-api";
 
@@ -34,6 +34,10 @@ export default function InventifyPage() {
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
   const [profileName, setProfileName] = useState("");
   const [profilePassword, setProfilePassword] = useState("");
+  const [adminSearch, setAdminSearch] = useState("");
+  const [adminCategoryFilter, setAdminCategoryFilter] = useState("");
+  const [adminDisplayCount, setAdminDisplayCount] = useState(30);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => { initOneSignal(); }, []);
 
@@ -67,6 +71,16 @@ export default function InventifyPage() {
       }
     }).finally(() => setLoading(false));
   }, [reloadDb]);
+
+  useEffect(() => {
+    if (role !== "admin" || !sentinelRef.current) return;
+    const el = sentinelRef.current;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setAdminDisplayCount((c) => c + 30);
+    }, { rootMargin: "200px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [role, adminSearch, adminCategoryFilter]);
 
   // Derived
   const products = db?.products || [];
@@ -510,6 +524,19 @@ export default function InventifyPage() {
                     <button onClick={() => setShowProductForm(true)} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition-colors">+ Add Product</button>
                   </div>
 
+                  <div className="mb-3 flex flex-col gap-2">
+                    <input type="text" value={adminSearch} onChange={(e) => { setAdminSearch(e.target.value); setAdminDisplayCount(30); }}
+                      placeholder="Search products..." className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                    <div className="flex flex-wrap gap-1.5">
+                      <button onClick={() => { setAdminCategoryFilter(""); setAdminDisplayCount(30); }}
+                        className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${!adminCategoryFilter ? "bg-amber-500/20 text-amber-400" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}>All</button>
+                      {categories.map((c) => (
+                        <button key={c.id} onClick={() => { setAdminCategoryFilter(c.id); setAdminDisplayCount(30); }}
+                          className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${adminCategoryFilter === c.id ? "bg-amber-500/20 text-amber-400" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}>{c.name}</button>
+                      ))}
+                    </div>
+                  </div>
+
                     {/* Manage Categories */}
                     <details className="mb-4">
                       <summary className="cursor-pointer text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors select-none">Manage Categories</summary>
@@ -544,8 +571,16 @@ export default function InventifyPage() {
                     </details>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {products.length === 0 ? <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
-                    products.map((p) => {
+                  {(() => {
+                    const q = adminSearch.toLowerCase().trim();
+                    const filtered = products.filter((p) => {
+                      if (adminCategoryFilter && p.category !== adminCategoryFilter) return false;
+                      if (q && !(p.description || p.name).toLowerCase().includes(q)) return false;
+                      return true;
+                    });
+                    const shown = filtered.slice(0, adminDisplayCount);
+                    if (shown.length === 0) return <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products found.</p>;
+                    return shown.map((p) => {
                       const assignedUser = p.assignedTo ? inventUsers.find((u) => u.id === p.assignedTo) : null;
                       return (
                         <div key={p.id} className="group relative flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
@@ -579,8 +614,20 @@ export default function InventifyPage() {
                         </div>
                       );
                     })
-                  )}
+                      );
+                    });
+                  })()}
                 </div>
+                {(() => {
+                  const q = adminSearch.toLowerCase().trim();
+                  const total = products.filter((p) => {
+                    if (adminCategoryFilter && p.category !== adminCategoryFilter) return false;
+                    if (q && !(p.description || p.name).toLowerCase().includes(q)) return false;
+                    return true;
+                  }).length;
+                  if (total <= adminDisplayCount) return null;
+                  return <div ref={sentinelRef} className="h-4" />;
+                })()}
               </>
             )}
             </>)}
