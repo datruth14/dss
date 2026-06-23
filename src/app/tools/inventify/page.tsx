@@ -23,7 +23,7 @@ export default function InventifyPage() {
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets" | "profile">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "", category: "", description: "" });
+  const [productForm, setProductForm] = useState({ description: "", image: "", totalCount: "", category: "" });
 
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
   const [requestPurpose, setRequestPurpose] = useState<Record<string, string>>({});
@@ -226,28 +226,24 @@ export default function InventifyPage() {
   };
 
   const saveProduct = async () => {
-    const name = productForm.name.trim();
+    const description = productForm.description.trim();
     const total = parseInt(productForm.totalCount);
     const image = productForm.image.trim() || undefined;
     const category = productForm.category || undefined;
-    const description = productForm.description.trim() || undefined;
-    if (!name || isNaN(total) || total < 1) return;
+    if (!description || isNaN(total) || total < 1) return;
     if (editProduct) {
-      const updated = { ...editProduct, name, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount) };
+      const updated = { ...editProduct, name: description, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount), description };
       if (category !== undefined) updated.category = category;
       else delete updated.category;
-      if (description !== undefined) updated.description = description;
-      else delete updated.description;
       await apiPost("updateProduct", updated);
     } else {
-      const p: Product = { id: crypto.randomUUID(), name, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString() };
+      const p: Product = { id: crypto.randomUUID(), name: description, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString(), description };
       if (category) p.category = category;
-      if (description) p.description = description;
       await apiPost("createProduct", p);
     }
     await reloadDb();
     setEditProduct(null);
-    setProductForm({ name: "", image: "", totalCount: "", category: "", description: "" });
+    setProductForm({ description: "", image: "", totalCount: "", category: "" });
   };
 
   const deleteProduct = async (p: Product) => {
@@ -464,8 +460,9 @@ export default function InventifyPage() {
                   <h2 className="text-sm font-semibold text-zinc-300">{editProduct ? "Edit Product" : "Add Product"}</h2>
                   <div className="mt-3 flex flex-col gap-3">
                     <div className="flex gap-3">
-                      <input type="text" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                        placeholder="Product name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                      <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                        placeholder="Product description"
+                        className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
                       <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
                         placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                     </div>
@@ -474,9 +471,6 @@ export default function InventifyPage() {
                       <option value="">Select category...</option>
                       {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
-                    <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                      placeholder="Description (optional)"
-                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
                     <div className="flex gap-3 items-center">
                       <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
                         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -490,9 +484,9 @@ export default function InventifyPage() {
                           <button onClick={() => setProductForm((p) => ({ ...p, image: "" }))} className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white hover:bg-red-500">x</button>
                         </div>
                       )}
-                      <button onClick={saveProduct} disabled={!productForm.name.trim() || !productForm.totalCount}
+                      <button onClick={saveProduct} disabled={!productForm.description.trim() || !productForm.totalCount}
                         className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
-                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", image: "", totalCount: "", category: "", description: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ description: "", image: "", totalCount: "", category: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
                     </div>
                   </div>
                 </div>
@@ -542,15 +536,14 @@ export default function InventifyPage() {
                           </div>
                           <div className="flex flex-1 flex-col justify-between p-3">
                             <div>
-                              <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                              {p.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{p.description}</p>}
+                              <p className="text-sm font-semibold text-white truncate">{p.description || p.name}</p>
                               {p.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(p.category)}</p>}
                               <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} unit(s)</p>
                               {assignedUser && <p className="text-xs text-amber-400 mt-0.5">Assigned to {assignedUser.name}</p>}
                             </div>
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="flex gap-2">
-                                <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount), category: p.category || "", description: p.description || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                                <button onClick={() => { setEditProduct(p); setProductForm({ description: p.description || "", image: p.image || "", totalCount: String(p.totalCount), category: p.category || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
                                 <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
                               </div>
                               {!p.assignedTo ? (
@@ -721,8 +714,7 @@ export default function InventifyPage() {
                           : <div className="flex h-full items-center justify-center text-zinc-600"><svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
                       </div>
                       <div className="p-3">
-                        <p className="text-sm font-semibold text-white truncate">{a.name}</p>
-                        {a.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{a.description}</p>}
+                        <p className="text-sm font-semibold text-white truncate">{a.description || a.name}</p>
                         {a.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(a.category)}</p>}
                         <p className="text-xs text-zinc-500 mt-0.5">Assigned to you</p>
                       </div>
@@ -770,8 +762,7 @@ export default function InventifyPage() {
                       </div>
                       <div className="flex flex-1 flex-col justify-between p-3">
                         <div>
-                          <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                          {p.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{p.description}</p>}
+                          <p className="text-sm font-semibold text-white truncate">{p.description || p.name}</p>
                           {p.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(p.category)}</p>}
                           <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} unit(s)</p>
                         </div>
