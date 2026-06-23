@@ -8,6 +8,8 @@ const FS_PATH = path.join(process.env.VERCEL ? "/tmp" : process.cwd(), "inventif
 const SEED_CATEGORIES = [
   "Table and Chairs Dressing", "Candles", "Tableware", "Lights",
   "Accreditation & Lanyards", "Furniture", "Water Station", "Signage",
+  "Table Covers", "Flower Vases & Stands", "Flowers & Foliage", "Fillers",
+  "Christmas Decor", "Equipment",
 ];
 
 const SEED_PRODUCTS: { desc: string; unit: string; loc: string; cat: string }[] = [
@@ -83,6 +85,65 @@ const SEED_PRODUCTS: { desc: string; unit: string; loc: string; cat: string }[] 
   { desc: "Signages", unit: "120", loc: "", cat: "Signage" },
   { desc: "Signages - Double", unit: "6", loc: "", cat: "Signage" },
   { desc: "Signage Stand", unit: "9", loc: "", cat: "Signage" },
+
+  // ---- Table Covers ----
+  { desc: "Gold Table Covers (Food Court)", unit: "150", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Blue Table Covers", unit: "180", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Black Table Covers", unit: "30", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "White Table Covers", unit: "300", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Champagne Table Covers", unit: "150", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Green Table Covers", unit: "60", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Purple Table Covers", unit: "40", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Lace Gold Overlay", unit: "70", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "Nude Table Covers", unit: "150", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+  { desc: "White Table Covers With Pleating", unit: "121", loc: "Decor Container Beside Programs' Office", cat: "Table Covers" },
+
+  // ---- Flower Vases & Stands ----
+  { desc: "Acrylic Flower Vases (Long)", unit: "200", loc: "Decor Container Beside Programs' Office", cat: "Flower Vases & Stands" },
+  { desc: "Metal Flower Stands", unit: "60", loc: "Decor Container Beside Programs' Office", cat: "Flower Vases & Stands" },
+  { desc: "Gold Flower Stands (Alucobond Made)", unit: "50", loc: "Bay 1", cat: "Flower Vases & Stands" },
+  { desc: "Silver Flower Stands (Alucobond Made)", unit: "40", loc: "Bay 1", cat: "Flower Vases & Stands" },
+  { desc: "Glass Table Vase For Flowers - Table Decor (Short)", unit: "120", loc: "Decor Container Beside Programs' Office", cat: "Flower Vases & Stands" },
+  { desc: "Flower Vases (Tall & Short Vases)", unit: "100", loc: "Decor Container Beside Programs' Office", cat: "Flower Vases & Stands" },
+  { desc: "Flowers Vases", unit: "30", loc: "Oasis Ballroom", cat: "Flower Vases & Stands" },
+
+  // ---- Flowers & Foliage ----
+  { desc: "Cherry Blossom Flowers (White)", unit: "1022", loc: "Programs' Office", cat: "Flowers & Foliage" },
+  { desc: "Cherry Blossom Flowers (Yellow)", unit: "28", loc: "Programs Office", cat: "Flowers & Foliage" },
+  { desc: "Lilac Roses", unit: "92", loc: "Programs Office", cat: "Flowers & Foliage" },
+  { desc: "Gold Roses", unit: "76", loc: "Programs Office", cat: "Flowers & Foliage" },
+  { desc: "Green Big Roses", unit: "80", loc: "Decor Container Beside Programs' Office", cat: "Flowers & Foliage" },
+  { desc: "White Big Roses", unit: "200", loc: "On Bleachers In Bay 1 & 2", cat: "Flowers & Foliage" },
+  { desc: "Burnt Orange Flowers", unit: "10", loc: "Decor Container Beside Programs' Office", cat: "Flowers & Foliage" },
+  { desc: "Rose Brushes (Champagne)", unit: "0", loc: "Decor Container Beside Programs' Office (1 Carton)", cat: "Flowers & Foliage" },
+  { desc: "Gold Flowers (Long)", unit: "50", loc: "Decor Container Beside Programs' Office", cat: "Flowers & Foliage" },
+  { desc: "Silver Flowers (Long)", unit: "50", loc: "Decor Container Beside Programs' Office", cat: "Flowers & Foliage" },
+  { desc: "Sunflowers (Small)", unit: "0", loc: "Decor Container (1 Bag)", cat: "Flowers & Foliage" },
+  { desc: "Wisteria Hanging Flowers (Pink)", unit: "0", loc: "Pinnacle Warehouse (1/2 Bag)", cat: "Flowers & Foliage" },
+  { desc: "Sunflowers (Big)", unit: "0", loc: "Decor Container (1 Bag)", cat: "Flowers & Foliage" },
+  { desc: "Wisteria Hanging Flowers (Purple)", unit: "0", loc: "In The Ceiling In The Hall In Bay 1 & 2", cat: "Flowers & Foliage" },
+  { desc: "Wisteria Hanging Flowers (White)", unit: "0", loc: "In The Ceiling In Bay 1 & 2", cat: "Flowers & Foliage" },
+
+  // ---- Fillers ----
+  { desc: "Purple Fillers (Small)", unit: "153", loc: "Programs Office", cat: "Fillers" },
+  { desc: "Green Fillers (Medium Size)", unit: "178", loc: "Programs Office", cat: "Fillers" },
+  { desc: "Green And White Fillers", unit: "171", loc: "Programs Office", cat: "Fillers" },
+  { desc: "Only Green (Very Small)", unit: "440", loc: "Programs Office", cat: "Fillers" },
+  { desc: "Five Branch Persia (Cream) For Table Flowers Meetings", unit: "300", loc: "Decor Container Beside Programs' Office", cat: "Fillers" },
+  { desc: "Green Fillers With Red Tip On Top", unit: "17", loc: "Programs Office", cat: "Fillers" },
+
+  // ---- Christmas Decor ----
+  { desc: "Christmas Trees", unit: "16", loc: "Bay 1", cat: "Christmas Decor" },
+  { desc: "Christmas Tree (Longest)", unit: "1", loc: "Bay 1", cat: "Christmas Decor" },
+  { desc: "Merry Christmas Wreath", unit: "25", loc: "Programs Office", cat: "Christmas Decor" },
+  { desc: "Merry Christmas Ornaments", unit: "30", loc: "Programs Office", cat: "Christmas Decor" },
+  { desc: "Xmas Bow Tie", unit: "3", loc: "Programs Office", cat: "Christmas Decor" },
+  { desc: "Christmas Garland", unit: "0", loc: "Bay 1", cat: "Christmas Decor" },
+
+  // ---- Equipment ----
+  { desc: "Morphy Richards Iron", unit: "1", loc: "Programs Office", cat: "Equipment" },
+  { desc: "Garment Steamer", unit: "1", loc: "Programs Office", cat: "Equipment" },
+  { desc: "Power Extension", unit: "1", loc: "Programs Office", cat: "Equipment" },
 ];
 
 async function getDb(): Promise<any> {
@@ -177,28 +238,31 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true });
 
       case "seed": {
-        if (db.products.length > 0) return NextResponse.json({ ok: true, message: "Already seeded" });
         const catMap: Record<string, string> = {};
         for (const name of SEED_CATEGORIES) {
-          const id = crypto.randomUUID();
-          db.categories.push({ id, name });
-          catMap[name] = id;
+          const existing = db.categories.find((c: any) => c.name === name);
+          if (existing) catMap[name] = existing.id;
+          else { const id = crypto.randomUUID(); db.categories.push({ id, name }); catMap[name] = id; }
         }
+        const existingDescs = new Set(db.products.map((p: any) => (p.description || p.name).toLowerCase().trim()));
         const now = new Date().toISOString();
+        let added = 0;
         for (const s of SEED_PRODUCTS) {
+          const desc = (s.unit.trim().length > 0 && isNaN(parseInt(s.unit.replace(/,/g, ""), 10)))
+            ? `${s.desc} (${s.unit.trim()})` : s.desc;
+          if (existingDescs.has(desc.toLowerCase().trim())) continue;
           const num = parseInt(s.unit.replace(/,/g, ""), 10);
-          const isText = isNaN(num) && s.unit.trim().length > 0;
-          const total = isText ? 0 : num;
-          const desc = isText ? `${s.desc} (${s.unit.trim()})` : s.desc;
+          const total = isNaN(num) ? 0 : num;
           db.products.push({
             id: crypto.randomUUID(), name: desc, description: desc,
             category: catMap[s.cat], location: s.loc || undefined,
             totalCount: total, availableCount: total,
             createdAt: now,
           });
+          added++;
         }
         await writeJson(KEY, FS_PATH, db);
-        return NextResponse.json({ ok: true, count: SEED_PRODUCTS.length });
+        return NextResponse.json({ ok: true, count: added });
       }
 
       default:
