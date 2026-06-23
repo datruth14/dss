@@ -33,6 +33,8 @@ export default function InventifyPage() {
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
   const [profileName, setProfileName] = useState("");
   const [profilePassword, setProfilePassword] = useState("");
+  const [importRows, setImportRows] = useState<{ description: string; unit: string; location: string; category: string }[] | null>(null);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => { initOneSignal(); }, []);
 
@@ -52,10 +54,6 @@ export default function InventifyPage() {
 
   useEffect(() => {
     reloadDb().then((data) => {
-      if (data.categories.length === 0) {
-        const cat: Category = { id: crypto.randomUUID(), name: "Table and Chairs Dressing" };
-        apiPost("createCategory", cat).then(() => reloadDb());
-      }
       const raw = localStorage.getItem("inventify-session");
       if (raw) {
         try {
@@ -450,13 +448,13 @@ export default function InventifyPage() {
           {/* Content */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             {adminView === "dashboard" && (
-              <div className="grid grid-cols-2 gap-4">
+              <><div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-white">{products.length}</p><p className="text-xs text-zinc-400 mt-1">Products</p></div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-white">{inventUsers.length}</p><p className="text-xs text-zinc-400 mt-1">Users</p></div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-amber-400">{requests.filter((r) => r.status === "pending").length}</p><p className="text-xs text-zinc-400 mt-1">Pending Requests</p></div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-amber-400">{requests.filter((r) => r.status === "return-pending").length}</p><p className="text-xs text-zinc-400 mt-1">Pending Returns</p></div>
               </div>
-            )}
+              </>)}
 
             {adminView === "products" && (
               <>
@@ -496,6 +494,66 @@ export default function InventifyPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Import from Excel */}
+                <details className="mb-4">
+                  <summary className="cursor-pointer text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors select-none">Import from Excel</summary>
+                  <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                    <input type="file" accept=".xlsx,.csv" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const XLSX = await import("xlsx");
+                      const buf = await file.arrayBuffer();
+                      const wb = XLSX.read(buf);
+                      const ws = wb.Sheets[wb.SheetNames[0]];
+                      const rows: any[] = XLSX.utils.sheet_to_json(ws);
+                      const mapped = rows.map((r: any) => ({
+                        description: String(r.Description || r.desc || r.name || r.Name || "").trim(),
+                        unit: String(r.Unit || r.unit || r.Count || r.count || "").trim(),
+                        location: String(r.Location || r.location || r.loc || "").trim(),
+                        category: String(r.Category || r.category || r.cat || "").trim(),
+                      })).filter((r) => r.description);
+                      setImportRows(mapped);
+                    }} className="w-full text-sm text-zinc-400 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-amber-600" />
+                    {importRows && (
+                      <>
+                        <p className="mt-3 text-xs text-zinc-500">{importRows.length} items found</p>
+                        <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-zinc-700 bg-black">
+                          <table className="w-full text-xs text-zinc-300">
+                            <thead><tr className="border-b border-zinc-700 text-zinc-500">
+                              <th className="px-2 py-1 text-left">Description</th>
+                              <th className="px-2 py-1 text-left">Unit</th>
+                              <th className="px-2 py-1 text-left">Location</th>
+                              <th className="px-2 py-1 text-left">Category</th>
+                            </tr></thead>
+                            <tbody>
+                              {importRows.slice(0, 20).map((r, i) => (
+                                <tr key={i} className="border-b border-zinc-800">
+                                  <td className="px-2 py-1 truncate max-w-40">{r.description}</td>
+                                  <td className="px-2 py-1">{r.unit}</td>
+                                  <td className="px-2 py-1 truncate max-w-32">{r.location}</td>
+                                  <td className="px-2 py-1 truncate max-w-24">{r.category}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          {importRows.length > 20 && <p className="px-2 py-1 text-xs text-zinc-600">...and {importRows.length - 20} more</p>}
+                        </div>
+                        <button disabled={importing} onClick={async () => {
+                          setImporting(true);
+                          await fetch("/api/inventify-db", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "bulkImport", data: { items: importRows } }),
+                          });
+                          await reloadDb();
+                          setImportRows(null);
+                          setImporting(false);
+                        }} className="mt-3 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">{importing ? "Importing..." : `Import All (${importRows.length})`}</button>
+                      </>
+                    )}
+                  </div>
+                </details>
 
                 {/* Manage Categories */}
                 <details className="mb-4">
