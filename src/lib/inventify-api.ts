@@ -10,6 +10,7 @@ export interface Product {
   name: string;
   category?: string;
   description?: string;
+  location?: string;
   image?: string;
   totalCount: number;
   availableCount: number;

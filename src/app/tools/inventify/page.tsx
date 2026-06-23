@@ -23,7 +23,7 @@ export default function InventifyPage() {
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets" | "profile">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [productForm, setProductForm] = useState({ description: "", image: "", totalCount: "", category: "" });
+  const [productForm, setProductForm] = useState({ description: "", image: "", totalCount: "", category: "", location: "" });
 
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
   const [requestPurpose, setRequestPurpose] = useState<Record<string, string>>({});
@@ -230,20 +230,24 @@ export default function InventifyPage() {
     const total = parseInt(productForm.totalCount);
     const image = productForm.image.trim() || undefined;
     const category = productForm.category || undefined;
+    const location = productForm.location.trim() || undefined;
     if (!description || isNaN(total) || total < 1) return;
     if (editProduct) {
-      const updated = { ...editProduct, name: description, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount), description };
+      const updated: any = { ...editProduct, name: description, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount), description };
       if (category !== undefined) updated.category = category;
       else delete updated.category;
+      if (location !== undefined) updated.location = location;
+      else delete updated.location;
       await apiPost("updateProduct", updated);
     } else {
-      const p: Product = { id: crypto.randomUUID(), name: description, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString(), description };
+      const p: any = { id: crypto.randomUUID(), name: description, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString(), description };
       if (category) p.category = category;
+      if (location) p.location = location;
       await apiPost("createProduct", p);
     }
     await reloadDb();
     setEditProduct(null);
-    setProductForm({ description: "", image: "", totalCount: "", category: "" });
+    setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" });
   };
 
   const deleteProduct = async (p: Product) => {
@@ -471,6 +475,8 @@ export default function InventifyPage() {
                       <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
                         placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                     </div>
+                    <input type="text" value={productForm.location} onChange={(e) => setProductForm({ ...productForm, location: e.target.value })}
+                      placeholder="Storage location (optional)" className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
                     <div className="flex gap-3 items-center">
                       <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
                         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -486,7 +492,7 @@ export default function InventifyPage() {
                       )}
                       <button onClick={saveProduct} disabled={!productForm.description.trim() || !productForm.totalCount}
                         className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
-                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ description: "", image: "", totalCount: "", category: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
                     </div>
                   </div>
                 </div>
@@ -543,7 +549,7 @@ export default function InventifyPage() {
                             </div>
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="flex gap-2">
-                                <button onClick={() => { setEditProduct(p); setProductForm({ description: p.description || "", image: p.image || "", totalCount: String(p.totalCount), category: p.category || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                                <button onClick={() => { setEditProduct(p); setProductForm({ description: p.description || "", image: p.image || "", totalCount: String(p.totalCount), category: p.category || "", location: p.location || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
                                 <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
                               </div>
                               {!p.assignedTo ? (
