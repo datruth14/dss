@@ -507,15 +507,18 @@ export default function InventifyPage() {
                       const wb = XLSX.read(buf);
                       const ws = wb.Sheets[wb.SheetNames[0]];
                       const rows: any[] = XLSX.utils.sheet_to_json(ws);
+                      if (rows.length === 0) { setImportRows([]); return; }
+                      const keys = Object.keys(rows[0]).map((k) => k.trim());
+                      const lk = (key: string) => keys.find((k) => k.toLowerCase() === key.toLowerCase()) || "";
                       const mapped = rows.map((r: any) => ({
-                        description: String(r.Description || r.desc || r.name || r.Name || "").trim(),
-                        unit: String(r.Unit || r.unit || r.Count || r.count || "").trim(),
-                        location: String(r.Location || r.location || r.loc || "").trim(),
-                        category: String(r.Category || r.category || r.cat || "").trim(),
+                        description: String(r[lk("Description")] || r[lk("desc")] || r[lk("name")] || "").trim(),
+                        unit: String(r[lk("Unit")] || r[lk("unit")] || r[lk("Count")] || r[lk("count")] || "").trim(),
+                        location: String(r[lk("Location")] || r[lk("location")] || r[lk("loc")] || "").trim(),
+                        category: String(r[lk("Category")] || r[lk("category")] || r[lk("cat")] || "").trim(),
                       })).filter((r) => r.description);
                       setImportRows(mapped);
                     }} className="w-full text-sm text-zinc-400 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-amber-600" />
-                    {importRows && (
+                    {importRows && importRows.length > 0 && (
                       <>
                         <p className="mt-3 text-xs text-zinc-500">{importRows.length} items found</p>
                         <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-zinc-700 bg-black">
@@ -551,6 +554,9 @@ export default function InventifyPage() {
                           setImporting(false);
                         }} className="mt-3 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">{importing ? "Importing..." : `Import All (${importRows.length})`}</button>
                       </>
+                    )}
+                    {importRows && importRows.length === 0 && (
+                      <p className="mt-3 text-xs text-red-400">No rows with a description column found. Make sure your Excel file has a column named "Description" (or "desc", "name").</p>
                     )}
                   </div>
                 </details>
