@@ -468,12 +468,13 @@ export default function InventifyPage() {
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-amber-400">{requests.filter((r) => r.status === "pending").length}</p><p className="text-xs text-zinc-400 mt-1">Pending Requests</p></div>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><p className="text-2xl font-bold text-amber-400">{requests.filter((r) => r.status === "return-pending").length}</p><p className="text-xs text-zinc-400 mt-1">Pending Returns</p></div>
               </div>
-              {products.length === 0 && (
-                <button onClick={async () => {
-                  await fetch("/api/inventify-db", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "seed" }) });
-                  await reloadDb();
-                }} className="mt-4 w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 transition-colors">Seed Default Data (72 items)</button>
-              )}
+              <button onClick={async () => {
+                const res = await fetch("/api/inventify-db", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "seed" }) });
+                const data = await res.json();
+                await reloadDb();
+                if (data.count > 0) alert(`Added ${data.count} new items`);
+                else alert("All seed items already exist in database");
+              }} className="mt-4 w-full rounded-lg bg-amber-500 py-3 text-sm font-semibold text-white hover:bg-amber-600 transition-colors">Seed Default Data</button>
               </>)}
 
             {adminView === "products" && (
