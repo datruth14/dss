@@ -543,7 +543,7 @@ export default function InventifyPage() {
                       </div>
                     </details>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {products.length === 0 ? <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
                     products.map((p) => {
                       const assignedUser = p.assignedTo ? inventUsers.find((u) => u.id === p.assignedTo) : null;
@@ -726,7 +726,7 @@ export default function InventifyPage() {
               {myAssets.length === 0 ? (
                 <p className="text-sm text-zinc-500 text-center pt-8">No assets assigned to you yet.</p>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {myAssets.map((a) => (
                     <div key={a.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
                       <div className="aspect-[4/3] bg-zinc-800">
@@ -773,7 +773,7 @@ export default function InventifyPage() {
               {getFilteredProducts().length === 0 ? (
                 <p className="text-sm text-zinc-500 text-center pt-8">No products found.</p>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {getFilteredProducts().map((p) => (
                     <div key={p.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
                       <div className="aspect-[4/3] bg-zinc-800">
