@@ -23,6 +23,7 @@ export default function InventifyPage() {
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets" | "profile">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [showProductForm, setShowProductForm] = useState(false);
   const [productForm, setProductForm] = useState({ description: "", image: "", totalCount: "", category: "", location: "" });
 
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
@@ -243,6 +244,7 @@ export default function InventifyPage() {
     }
     await reloadDb();
     setEditProduct(null);
+    setShowProductForm(false);
     setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" });
   };
 
@@ -462,77 +464,86 @@ export default function InventifyPage() {
 
             {adminView === "products" && (
               <>
-                <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-                  <h2 className="text-sm font-semibold text-zinc-300">{editProduct ? "Edit Product" : "Add Product"}</h2>
-                  <div className="mt-3 flex flex-col gap-3">
-                    <select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-300 focus:border-amber-500 focus:outline-none">
-                      <option value="">Select category...</option>
-                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                    <div className="flex gap-3">
-                      <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                        placeholder="Product description"
-                        className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
-                      <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
-                        placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
+                {showProductForm || editProduct ? (
+                  <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-sm font-semibold text-zinc-300">{editProduct ? "Edit Product" : "Add Product"}</h2>
+                      <button onClick={() => { setEditProduct(null); setShowProductForm(false); setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" }); }} className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors">Back</button>
                     </div>
-                    <input type="text" value={productForm.location} onChange={(e) => setProductForm({ ...productForm, location: e.target.value })}
-                      placeholder="Storage location (optional)" className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-                    <div className="flex gap-3 items-center">
-                      <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
-                        <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <span className="truncate">{uploading ? "Uploading..." : productForm.image ? "Change image" : "Upload image"}</span>
-                        <input type="file" accept="image/*" className="hidden" disabled={uploading}
-                          onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} />
-                      </label>
-                      {productForm.image && (
-                        <div className="relative shrink-0">
-                          <img src={productForm.image} alt="" className="h-14 w-14 rounded-lg object-cover" />
-                          <button onClick={() => setProductForm((p) => ({ ...p, image: "" }))} className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white hover:bg-red-500">x</button>
-                        </div>
-                      )}
-                      <button onClick={saveProduct} disabled={!productForm.description.trim() || !productForm.totalCount}
-                        className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
-                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Manage Categories */}
-                <details className="mb-4">
-                  <summary className="cursor-pointer text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors select-none">Manage Categories</summary>
-                  <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-                    <div className="flex gap-2">
-                      <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="New category name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-                      <button onClick={async () => {
-                        const name = newCategoryName.trim();
-                        if (!name) return;
-                        await apiPost("createCategory", { id: crypto.randomUUID(), name });
-                        await reloadDb();
-                        setNewCategoryName("");
-                      }} disabled={!newCategoryName.trim()}
-                        className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Add</button>
-                    </div>
-                    {categories.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {categories.map((c) => (
-                          <div key={c.id} className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-sm text-zinc-300">
-                            <span>{c.name}</span>
-                            <button onClick={async () => {
-                              if (!confirm(`Delete category "${c.name}"?`)) return;
-                              await apiPost("deleteCategory", { id: c.id });
-                              await reloadDb();
-                            }} className="text-xs text-red-400 hover:text-red-300">&times;</button>
-                          </div>
-                        ))}
+                    <div className="flex flex-col gap-3">
+                      <select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                        className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-300 focus:border-amber-500 focus:outline-none">
+                        <option value="">Select category...</option>
+                        {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                      <div className="flex gap-3">
+                        <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                          placeholder="Product description"
+                          className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
+                        <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
+                          placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                       </div>
-                    )}
+                      <input type="text" value={productForm.location} onChange={(e) => setProductForm({ ...productForm, location: e.target.value })}
+                        placeholder="Storage location (optional)" className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                      <div className="flex gap-3 items-center">
+                        <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
+                          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                          <span className="truncate">{uploading ? "Uploading..." : productForm.image ? "Change image" : "Upload image"}</span>
+                          <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} />
+                        </label>
+                        {productForm.image && (
+                          <div className="relative shrink-0">
+                            <img src={productForm.image} alt="" className="h-14 w-14 rounded-lg object-cover" />
+                            <button onClick={() => setProductForm((p) => ({ ...p, image: "" }))} className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white hover:bg-red-500">x</button>
+                          </div>
+                        )}
+                        <button onClick={saveProduct} disabled={!productForm.description.trim() || !productForm.totalCount}
+                          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
+                        <button onClick={() => { setEditProduct(null); setShowProductForm(false); setProductForm({ description: "", image: "", totalCount: "", category: "", location: "" }); }} className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors">Cancel</button>
+                      </div>
+                    </div>
                   </div>
-                </details>
+                ) : (
+                  <><div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-sm font-semibold text-zinc-300">All Products ({products.length})</h2>
+                    <button onClick={() => setShowProductForm(true)} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition-colors">+ Add Product</button>
+                  </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {/* Manage Categories */}
+                    <details className="mb-4">
+                      <summary className="cursor-pointer text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors select-none">Manage Categories</summary>
+                      <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                        <div className="flex gap-2">
+                          <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)}
+                            placeholder="New category name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                          <button onClick={async () => {
+                            const name = newCategoryName.trim();
+                            if (!name) return;
+                            await apiPost("createCategory", { id: crypto.randomUUID(), name });
+                            await reloadDb();
+                            setNewCategoryName("");
+                          }} disabled={!newCategoryName.trim()}
+                            className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Add</button>
+                        </div>
+                        {categories.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {categories.map((c) => (
+                              <div key={c.id} className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-sm text-zinc-300">
+                                <span>{c.name}</span>
+                                <button onClick={async () => {
+                                  if (!confirm(`Delete category "${c.name}"?`)) return;
+                                  await apiPost("deleteCategory", { id: c.id });
+                                  await reloadDb();
+                                }} className="text-xs text-red-400 hover:text-red-300">&times;</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {products.length === 0 ? <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
                     products.map((p) => {
                       const assignedUser = p.assignedTo ? inventUsers.find((u) => u.id === p.assignedTo) : null;
@@ -551,7 +562,7 @@ export default function InventifyPage() {
                             </div>
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="flex gap-2">
-                                <button onClick={() => { setEditProduct(p); setProductForm({ description: p.description || "", image: p.image || "", totalCount: String(p.totalCount), category: p.category || "", location: p.location || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                                <button onClick={() => { setEditProduct(p); setShowProductForm(true); setProductForm({ description: p.description || "", image: p.image || "", totalCount: String(p.totalCount), category: p.category || "", location: p.location || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
                                 <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
                               </div>
                               {!p.assignedTo ? (
