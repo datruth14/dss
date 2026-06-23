@@ -11,6 +11,7 @@ async function getDb(): Promise<any> {
     products: raw.products || [],
     users: raw.users || [],
     requests: raw.requests || [],
+    categories: raw.categories || [],
     oneSignalSubscriptions: raw.oneSignalSubscriptions || [],
   };
 }
@@ -82,6 +83,16 @@ export async function POST(request: NextRequest) {
         if (!db.oneSignalSubscriptions.find((s: any) => s.id === body.data.id)) {
           db.oneSignalSubscriptions.push(body.data);
         }
+        await writeJson(KEY, FS_PATH, db);
+        return NextResponse.json({ ok: true });
+
+      case "createCategory":
+        db.categories.push(body.data);
+        await writeJson(KEY, FS_PATH, db);
+        return NextResponse.json({ ok: true });
+
+      case "deleteCategory":
+        db.categories = db.categories.filter((c: any) => c.id !== body.data.id);
         await writeJson(KEY, FS_PATH, db);
         return NextResponse.json({ ok: true });
 

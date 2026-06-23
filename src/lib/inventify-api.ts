@@ -1,8 +1,15 @@
 const API = "/api/inventify-db";
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
 export interface Product {
   id: string;
   name: string;
+  category?: string;
+  description?: string;
   image?: string;
   totalCount: number;
   availableCount: number;
@@ -36,6 +43,7 @@ export interface DbData {
   products: Product[];
   users: InventifyUser[];
   requests: Request[];
+  categories: Category[];
   oneSignalSubscriptions: { id: string; playerId: string; role: string }[];
 }
 

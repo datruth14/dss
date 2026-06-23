@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getDb, apiPost } from "@/lib/inventify-api";
-import type { Product, InventifyUser, Request, DbData } from "@/lib/inventify-api";
+import type { Product, InventifyUser, Request, DbData, Category } from "@/lib/inventify-api";
 
 const ADMIN_CODE = "123456789";
 
@@ -23,7 +23,7 @@ export default function InventifyPage() {
   const [adminView, setAdminView] = useState<"dashboard" | "products" | "requests" | "history" | "users">("dashboard");
   const [userView, setUserView] = useState<"dashboard" | "my-requests" | "my-assets" | "profile">("dashboard");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "" });
+  const [productForm, setProductForm] = useState({ name: "", image: "", totalCount: "", category: "", description: "" });
 
   const [requestQty, setRequestQty] = useState<Record<string, string>>({});
   const [requestPurpose, setRequestPurpose] = useState<Record<string, string>>({});
@@ -52,6 +52,10 @@ export default function InventifyPage() {
 
   useEffect(() => {
     reloadDb().then((data) => {
+      if (data.categories.length === 0) {
+        const cat: Category = { id: crypto.randomUUID(), name: "Table and Chairs Dressing" };
+        apiPost("createCategory", cat).then(() => reloadDb());
+      }
       const raw = localStorage.getItem("inventify-session");
       if (raw) {
         try {
@@ -71,6 +75,14 @@ export default function InventifyPage() {
   const products = db?.products || [];
   const inventUsers = db?.users || [];
   const requests = db?.requests || [];
+  const categories = db?.categories || [];
+
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  function categoryName(id?: string) {
+    if (!id) return "";
+    return categories.find((c) => c.id === id)?.name || id;
+  }
 
   function statusLabel(s: string) {
     const map: Record<string, string> = {
@@ -217,17 +229,25 @@ export default function InventifyPage() {
     const name = productForm.name.trim();
     const total = parseInt(productForm.totalCount);
     const image = productForm.image.trim() || undefined;
+    const category = productForm.category || undefined;
+    const description = productForm.description.trim() || undefined;
     if (!name || isNaN(total) || total < 1) return;
     if (editProduct) {
       const updated = { ...editProduct, name, image, totalCount: total, availableCount: total - (editProduct.totalCount - editProduct.availableCount) };
+      if (category !== undefined) updated.category = category;
+      else delete updated.category;
+      if (description !== undefined) updated.description = description;
+      else delete updated.description;
       await apiPost("updateProduct", updated);
     } else {
       const p: Product = { id: crypto.randomUUID(), name, image, totalCount: total, availableCount: total, createdAt: new Date().toISOString() };
+      if (category) p.category = category;
+      if (description) p.description = description;
       await apiPost("createProduct", p);
     }
     await reloadDb();
     setEditProduct(null);
-    setProductForm({ name: "", image: "", totalCount: "" });
+    setProductForm({ name: "", image: "", totalCount: "", category: "", description: "" });
   };
 
   const deleteProduct = async (p: Product) => {
@@ -447,8 +467,16 @@ export default function InventifyPage() {
                       <input type="text" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                         placeholder="Product name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
                       <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
-                        placeholder="Count" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
+                        placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                     </div>
+                    <select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-300 focus:border-amber-500 focus:outline-none">
+                      <option value="">Select category...</option>
+                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                    <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                      placeholder="Description (optional)"
+                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
                     <div className="flex gap-3 items-center">
                       <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
                         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -464,10 +492,44 @@ export default function InventifyPage() {
                       )}
                       <button onClick={saveProduct} disabled={!productForm.name.trim() || !productForm.totalCount}
                         className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors whitespace-nowrap">{editProduct ? "Update" : "Add"}</button>
-                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", image: "", totalCount: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
+                      {editProduct && <button onClick={() => { setEditProduct(null); setProductForm({ name: "", image: "", totalCount: "", category: "", description: "" }); }} className="text-xs text-zinc-500 hover:text-zinc-300">Cancel</button>}
                     </div>
                   </div>
                 </div>
+
+                {/* Manage Categories */}
+                <details className="mb-4">
+                  <summary className="cursor-pointer text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors select-none">Manage Categories</summary>
+                  <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                    <div className="flex gap-2">
+                      <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)}
+                        placeholder="New category name" className="flex-1 rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
+                      <button onClick={async () => {
+                        const name = newCategoryName.trim();
+                        if (!name) return;
+                        await apiPost("createCategory", { id: crypto.randomUUID(), name });
+                        await reloadDb();
+                        setNewCategoryName("");
+                      }} disabled={!newCategoryName.trim()}
+                        className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-40 transition-colors">Add</button>
+                    </div>
+                    {categories.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {categories.map((c) => (
+                          <div key={c.id} className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-3 py-1.5 text-sm text-zinc-300">
+                            <span>{c.name}</span>
+                            <button onClick={async () => {
+                              if (!confirm(`Delete category "${c.name}"?`)) return;
+                              await apiPost("deleteCategory", { id: c.id });
+                              await reloadDb();
+                            }} className="text-xs text-red-400 hover:text-red-300">&times;</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </details>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {products.length === 0 ? <p className="col-span-full text-center text-sm text-zinc-500 pt-8">No products yet.</p> : (
                     products.map((p) => {
@@ -481,12 +543,14 @@ export default function InventifyPage() {
                           <div className="flex flex-1 flex-col justify-between p-3">
                             <div>
                               <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                              <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} available</p>
+                              {p.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{p.description}</p>}
+                              {p.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(p.category)}</p>}
+                              <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} / {p.totalCount} unit(s)</p>
                               {assignedUser && <p className="text-xs text-amber-400 mt-0.5">Assigned to {assignedUser.name}</p>}
                             </div>
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="flex gap-2">
-                                <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount) }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
+                                <button onClick={() => { setEditProduct(p); setProductForm({ name: p.name, image: p.image || "", totalCount: String(p.totalCount), category: p.category || "", description: p.description || "" }); }} className="flex-1 rounded bg-amber-500/10 py-1.5 text-xs font-medium text-amber-400 hover:bg-amber-500/20 transition-colors">Edit</button>
                                 <button onClick={() => deleteProduct(p)} className="flex-1 rounded bg-red-500/10 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors">Delete</button>
                               </div>
                               {!p.assignedTo ? (
@@ -658,6 +722,8 @@ export default function InventifyPage() {
                       </div>
                       <div className="p-3">
                         <p className="text-sm font-semibold text-white truncate">{a.name}</p>
+                        {a.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{a.description}</p>}
+                        {a.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(a.category)}</p>}
                         <p className="text-xs text-zinc-500 mt-0.5">Assigned to you</p>
                       </div>
                     </div>
@@ -705,7 +771,9 @@ export default function InventifyPage() {
                       <div className="flex flex-1 flex-col justify-between p-3">
                         <div>
                           <p className="text-sm font-semibold text-white truncate">{p.name}</p>
-                          <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} available</p>
+                          {p.description && <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{p.description}</p>}
+                          {p.category && <p className="text-xs text-zinc-400 mt-0.5">{categoryName(p.category)}</p>}
+                          <p className="text-xs text-zinc-500 mt-0.5">{p.availableCount} unit(s)</p>
                         </div>
                         <div className="mt-2 space-y-2">
                           <input type="text" value={requestPurpose[p.id] || ""}
