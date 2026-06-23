@@ -176,41 +176,6 @@ export async function POST(request: NextRequest) {
         await writeJson(KEY, FS_PATH, db);
         return NextResponse.json({ ok: true });
 
-      case "bulkImport": {
-        const items: { description: string; unit?: string; location?: string; category?: string }[] = body.data.items || [];
-        const catMap2: Record<string, string> = {};
-        const now = new Date().toISOString();
-        for (const item of items) {
-          if (!item.description) continue;
-          let catId = "";
-          if (item.category) {
-            if (!catMap2[item.category]) {
-              const existing = db.categories.find((c: any) => c.name.toLowerCase() === item.category!.toLowerCase());
-              if (existing) catMap2[item.category] = existing.id;
-              else {
-                const id = crypto.randomUUID();
-                db.categories.push({ id, name: item.category });
-                catMap2[item.category] = id;
-              }
-            }
-            catId = catMap2[item.category];
-          }
-          const unitStr = (item.unit || "").replace(/,/g, "").trim();
-          const num = parseInt(unitStr, 10);
-          const isText = isNaN(num) && unitStr.length > 0;
-          const total = isText ? 0 : num;
-          const desc = isText ? `${item.description} (${unitStr})` : item.description;
-          db.products.push({
-            id: crypto.randomUUID(), name: desc, description: desc,
-            category: catId || undefined, location: item.location || undefined,
-            totalCount: total, availableCount: total,
-            createdAt: now,
-          });
-        }
-        await writeJson(KEY, FS_PATH, db);
-        return NextResponse.json({ ok: true, count: items.filter((i: any) => i.description).length });
-      }
-
       case "seed": {
         if (db.products.length > 0) return NextResponse.json({ ok: true, message: "Already seeded" });
         const catMap: Record<string, string> = {};
