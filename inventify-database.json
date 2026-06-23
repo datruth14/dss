@@ -1,1 +1,753 @@
-{"products":[],"users":[],"requests":[],"oneSignalSubscriptions":[]}
+{
+  "products": [
+    {
+      "id": "0506155e-0604-48ad-b0f3-554e0c4a5279",
+      "name": "White Chair Covers",
+      "description": "White Chair Covers",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 1 (2,121 at the dry cleaners)",
+      "totalCount": 4121,
+      "availableCount": 4121,
+      "createdAt": "2026-06-23T23:00:46.208Z"
+    },
+    {
+      "id": "33fbc4a4-84e1-450e-aae7-2f368a0d7cde",
+      "name": "Gold Chair Covers",
+      "description": "Gold Chair Covers",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 1 (350 at the dry cleaners)",
+      "totalCount": 850,
+      "availableCount": 850,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "9b4cda08-5b5e-4369-87c0-0d09e6c78440",
+      "name": "Padded Chairs",
+      "description": "Padded Chairs",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 1",
+      "totalCount": 500,
+      "availableCount": 500,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "34257bc7-d813-4351-a1ae-8dbd5908ba74",
+      "name": "Green chair Pad Cover",
+      "description": "Green chair Pad Cover",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 1",
+      "totalCount": 850,
+      "availableCount": 850,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "35b9de61-11ad-435f-866b-3d272950a054",
+      "name": "Gold Chair sashes/cap",
+      "description": "Gold Chair sashes/cap",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 850,
+      "availableCount": 850,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "2a71a1e7-a8de-4ade-a16c-2838ce66ecbd",
+      "name": "Pink/Peach Sashes",
+      "description": "Pink/Peach Sashes",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 500,
+      "availableCount": 500,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "5d7b9420-2835-4fbc-9564-9a0d322dbd04",
+      "name": "Napkins - Lilac",
+      "description": "Napkins - Lilac",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 285,
+      "availableCount": 285,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "18ef96ce-0384-4b56-a97c-5197e7caca74",
+      "name": "Napkins - Margenta",
+      "description": "Napkins - Margenta",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 88,
+      "availableCount": 88,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "bd0bc5e3-5393-43f9-970f-5ede35dbec25",
+      "name": "Napkins - Gold",
+      "description": "Napkins - Gold",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 285,
+      "availableCount": 285,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "3dab0b1d-68f8-4079-8546-97a23c60c9c4",
+      "name": "Napkins - Nude",
+      "description": "Napkins - Nude",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 140,
+      "availableCount": 140,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "50f23ec9-8995-4570-a816-b24e97bac276",
+      "name": "Napkins - Wine",
+      "description": "Napkins - Wine",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 480,
+      "availableCount": 480,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "b54368d7-6c6e-4626-96c7-a2a0708785a8",
+      "name": "Napkins - Green Damask",
+      "description": "Napkins - Green Damask",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 84,
+      "availableCount": 84,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "fba8e8a6-6cbe-41bf-96e1-421d420c154e",
+      "name": "Napkins - Green Satin",
+      "description": "Napkins - Green Satin",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 260,
+      "availableCount": 260,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0498aead-5d26-4f33-aede-2b8948849d84",
+      "name": "Napkins at the dry Cleaners (Different colors)",
+      "description": "Napkins at the dry Cleaners (Different colors)",
+      "category": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "location": "Programs Office Store 3",
+      "totalCount": 870,
+      "availableCount": 870,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "25c056be-6e47-43fa-a711-9633980d721d",
+      "name": "Long Slim LED Candles",
+      "description": "Long Slim LED Candles",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 120,
+      "availableCount": 120,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "5b308105-8cda-4c21-8b84-8929a9828c97",
+      "name": "Long Fat LED Candles",
+      "description": "Long Fat LED Candles",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 22,
+      "availableCount": 22,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "f628578b-78f4-438e-9706-275f27023114",
+      "name": "LED Medium length",
+      "description": "LED Medium length",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 25,
+      "availableCount": 25,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "228c7758-2bf2-4434-a6e0-1682b882a954",
+      "name": "LED Short length",
+      "description": "LED Short length",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 92,
+      "availableCount": 92,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "7e8350e9-1834-439a-888e-dc356698966d",
+      "name": "Electronic Swing Candles",
+      "description": "Electronic Swing Candles",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 42,
+      "availableCount": 42,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "e389bc52-a0af-4676-b00a-176c7107eb9f",
+      "name": "Grey LCD Candle 9 Packs (Set of 3)",
+      "description": "Grey LCD Candle 9 Packs (Set of 3)",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 27,
+      "availableCount": 27,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "abece301-71e7-4ba0-a2fd-2575dce60c09",
+      "name": "Real Touch serrated Candles (3 Lengths)",
+      "description": "Real Touch serrated Candles (3 Lengths)",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 33,
+      "availableCount": 33,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "01e439e6-d78f-4ec5-9c3f-15e369e8079a",
+      "name": "8.5X22CM Candles (Long and Fat) 20 pair",
+      "description": "8.5X22CM Candles (Long and Fat) 20 pair",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 40,
+      "availableCount": 40,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "a43eac51-d54b-4e04-a897-344f2f5e38cd",
+      "name": "Long candle sticks - Gold",
+      "description": "Long candle sticks - Gold",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 113,
+      "availableCount": 113,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "95c45e2b-b5a1-4f3c-93e7-b356c21be233",
+      "name": "Long candle sticks - White",
+      "description": "Long candle sticks - White",
+      "category": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 36,
+      "availableCount": 36,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "991de654-9db1-4950-af30-b6f26c8247cd",
+      "name": "Crystal Candelabras",
+      "description": "Crystal Candelabras",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 24,
+      "availableCount": 24,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "be584460-e509-4a50-a7d4-f5c3ab0ebe99",
+      "name": "Silver and stone Candelabra",
+      "description": "Silver and stone Candelabra",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "76e1f727-1b85-4b86-8bb2-f2fe28232fe7",
+      "name": "Gold Square Plate Chargers",
+      "description": "Gold Square Plate Chargers",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 120,
+      "availableCount": 120,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "16041150-4176-425a-bf1d-382fa5492075",
+      "name": "Rubber Plate Chargers",
+      "description": "Rubber Plate Chargers",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "To be retrieved from Sister Omoh",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "38f598fa-c9fc-4cb1-a7ac-8ed529623bbf",
+      "name": "Flower Napkin Rings",
+      "description": "Flower Napkin Rings",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 120,
+      "availableCount": 120,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "197c46a4-e0cf-46f8-acc4-01f11ebcd695",
+      "name": "Round Napkin Rings",
+      "description": "Round Napkin Rings",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 210,
+      "availableCount": 210,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "44f16ce0-5717-4140-8919-df159bbc40d8",
+      "name": "Heavy Dangling Crystals",
+      "description": "Heavy Dangling Crystals",
+      "category": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "location": "Programs Office Store 2 (Shelves)",
+      "totalCount": 121,
+      "availableCount": 121,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "f38185d7-b28e-431c-bea4-d489fdc0efea",
+      "name": "Pipe Lights - New",
+      "description": "Pipe Lights - New",
+      "category": "af683f1b-4b0f-4ad3-bba6-a21a00b5e578",
+      "location": "Programs Office Store 3",
+      "totalCount": 35,
+      "availableCount": 35,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "6d3ce238-bdf8-482a-92bb-61af588aa8ca",
+      "name": "20 Bulbs string light - New",
+      "description": "20 Bulbs string light - New",
+      "category": "af683f1b-4b0f-4ad3-bba6-a21a00b5e578",
+      "location": "Programs Office Store 3",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "d7ea5724-2a3f-45d2-99e1-d6139bd58c7b",
+      "name": "String Lights - New",
+      "description": "String Lights - New",
+      "category": "af683f1b-4b0f-4ad3-bba6-a21a00b5e578",
+      "location": "Programs Office Store 3",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "85870cc1-08a5-4483-afec-5d546c5666ae",
+      "name": "Accreditation Desks",
+      "description": "Accreditation Desks",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "Programs Office Corridor",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "08c12d27-2bc1-4100-92f9-98cb52cd8b36",
+      "name": "Accreditation Center Backdrop",
+      "description": "Accreditation Center Backdrop",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "Programs Office Corridor",
+      "totalCount": 1,
+      "availableCount": 1,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "63489c7a-17a3-47fc-b3fe-7695e40aef7c",
+      "name": "Backdrop and Banner Frames",
+      "description": "Backdrop and Banner Frames",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "Programs Office Corridor",
+      "totalCount": 10,
+      "availableCount": 10,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0cc0fc11-2679-4b75-8965-1eed313f795d",
+      "name": "Pouches - New",
+      "description": "Pouches - New",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container",
+      "totalCount": 40000,
+      "availableCount": 40000,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "175a29c8-0785-4225-99b7-847b83c5089d",
+      "name": "Ministry Programs Lanyards - Blue",
+      "description": "Ministry Programs Lanyards - Blue",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (2 Big Sacks)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "ddae0f74-b661-4293-99a6-f76a4b786eec",
+      "name": "Ministry Programs Lanyards - Purple",
+      "description": "Ministry Programs Lanyards - Purple",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (1 Bag)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "3f8117e1-4755-49ba-9b9b-a4036fa4b526",
+      "name": "Ministry Programs Lanyards - Other Colors",
+      "description": "Ministry Programs Lanyards - Other Colors",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (1 Sack)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "566875c9-9d35-459d-ae67-22f6b71e0390",
+      "name": "Unbranded Purple Lanyards",
+      "description": "Unbranded Purple Lanyards",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (1 Carton)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "604e8cd8-b5bf-4a92-ae68-8ce14d65e8fd",
+      "name": "December 24 Christmas Eve Service Lanyards",
+      "description": "December 24 Christmas Eve Service Lanyards",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (1 Sack)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "2866b1fe-acb2-450f-8317-fa2afe9a8db2",
+      "name": "IPPC 2024 Lanyards - Different colors",
+      "description": "IPPC 2024 Lanyards - Different colors",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (2 Sacks)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "6bccbe5a-ebc7-48b2-b3a6-b3772a0b95d8",
+      "name": "LLC Lanyards - No Date",
+      "description": "LLC Lanyards - No Date",
+      "category": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "location": "DSS Container (1 Small Sack)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "aadcd35e-30e1-475d-a1de-ece691db2ad9",
+      "name": "New Tables",
+      "description": "New Tables",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 1",
+      "totalCount": 50,
+      "availableCount": 50,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "06620e9b-51cb-45fd-8645-92c05eba5fa3",
+      "name": "Wooden Detachable Stands with Cupboards",
+      "description": "Wooden Detachable Stands with Cupboards",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 1",
+      "totalCount": 15,
+      "availableCount": 15,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0e8594d3-15de-4b2b-9ffd-d1b78a6f994c",
+      "name": "Gold Board Food Stands",
+      "description": "Gold Board Food Stands",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 1",
+      "totalCount": 12,
+      "availableCount": 12,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "be660946-9753-425a-9dbc-e9962c1e984e",
+      "name": "Snack Bars with Shelves",
+      "description": "Snack Bars with Shelves",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Ware House",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "7d04d08a-0afe-4c2c-9f6f-41b04231eca7",
+      "name": "Sitouts",
+      "description": "Sitouts",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Ware House",
+      "totalCount": 12,
+      "availableCount": 12,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "999dacf2-177e-42bf-9966-d387d0363608",
+      "name": "Directors Carrier Bags",
+      "description": "Directors Carrier Bags",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 1 (Over 3,000)",
+      "totalCount": 3000,
+      "availableCount": 3000,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "ad79fd9d-d5c5-44df-bbfc-ddbde1342e55",
+      "name": "HOP's Carrier Bags",
+      "description": "HOP's Carrier Bags",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 1",
+      "totalCount": 300,
+      "availableCount": 300,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "9bdb18ae-e1b3-4c07-906d-c8cf33fa6cc5",
+      "name": "Programs Branded Draw String Bags",
+      "description": "Programs Branded Draw String Bags",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 2 (Over 5,000)",
+      "totalCount": 5000,
+      "availableCount": 5000,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "4db5f904-d90c-454d-858c-d93d378b7f39",
+      "name": "Gold Disposable cutleries (Spoon, knives & forks)",
+      "description": "Gold Disposable cutleries (Spoon, knives & forks)",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 2 (2 Cartons)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "c09ef542-6ce1-4f51-9197-7fd3cd7e8570",
+      "name": "Dental Floss",
+      "description": "Dental Floss",
+      "category": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "location": "Programs Office Store 2 (1/2 Carton)",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "4a41fbf3-e79e-416b-9650-770e7c4cfc67",
+      "name": "Water Station Stand",
+      "description": "Water Station Stand",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Bay 2 Welcome Area",
+      "totalCount": 1,
+      "availableCount": 1,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "ba8317c7-8eab-4cb5-8eca-01cb53f60cff",
+      "name": "Single Water Station Unit",
+      "description": "Single Water Station Unit",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Programs Office Store 1",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "d2b4cd8a-75aa-4762-a20e-3925921e874a",
+      "name": "Water Dispensers Machine",
+      "description": "Water Dispensers Machine",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Programs Office Store 1",
+      "totalCount": 17,
+      "availableCount": 17,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "cc6fc610-3d38-4c61-a4d4-317bf0cfa212",
+      "name": "Water Dispenser Stand",
+      "description": "Water Dispenser Stand",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Programs Office Store 1",
+      "totalCount": 20,
+      "availableCount": 20,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "fc682148-7562-4b88-915c-f415cb2edb01",
+      "name": "Refill Bottles",
+      "description": "Refill Bottles",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Programs Office Store 1",
+      "totalCount": 165,
+      "availableCount": 165,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "d2a82c5e-0bd5-4702-90ab-771f30e8df5d",
+      "name": "Giant Coolers",
+      "description": "Giant Coolers",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Ware House",
+      "totalCount": 2,
+      "availableCount": 2,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "d96bd6a2-1d04-4ad6-8612-c53202ff5694",
+      "name": "Disposable Cups",
+      "description": "Disposable Cups",
+      "category": "b696b228-492b-4a99-8636-4c633501a89b",
+      "location": "Programs Office Store 2",
+      "totalCount": 165,
+      "availableCount": 165,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "c66a21a2-d103-4e79-961d-a70a604796e6",
+      "name": "Barricades",
+      "description": "Barricades",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 97,
+      "availableCount": 97,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "3211b2fc-6546-4f02-8545-f72175fda4a9",
+      "name": "Stanchions",
+      "description": "Stanchions",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "c92c7ead-1b6c-4ba5-9fcb-d57ed818b1c2",
+      "name": "Serpentines",
+      "description": "Serpentines",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "location": "3 Sets",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "5f12b81a-6756-4de9-a96b-3ae81eb469e4",
+      "name": "Flags",
+      "description": "Flags",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 329,
+      "availableCount": 329,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "34995c79-eed1-42db-9dec-235be36f3f04",
+      "name": "Flag Poles",
+      "description": "Flag Poles",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "location": "3 Sets",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0666c3fb-44af-4436-b20c-796779f0f304",
+      "name": "Pop Up Banner",
+      "description": "Pop Up Banner",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 28,
+      "availableCount": 28,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "c4d3692b-1b01-41ab-8330-3d718c585fc5",
+      "name": "Flying Banners",
+      "description": "Flying Banners",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 0,
+      "availableCount": 0,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "9ba8d0b1-37e8-4f3c-b406-694806af1b27",
+      "name": "Signages",
+      "description": "Signages",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 120,
+      "availableCount": 120,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0c42a6cb-7835-4e16-8e0f-6a064efd5807",
+      "name": "Signages - Double",
+      "description": "Signages - Double",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 6,
+      "availableCount": 6,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    },
+    {
+      "id": "0baee0f5-0c20-489a-b4cb-2e035fea4482",
+      "name": "Signage Stand",
+      "description": "Signage Stand",
+      "category": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "totalCount": 9,
+      "availableCount": 9,
+      "createdAt": "2026-06-23T23:00:46.209Z"
+    }
+  ],
+  "users": [],
+  "requests": [],
+  "oneSignalSubscriptions": [],
+  "categories": [
+    {
+      "id": "8c1d8fd1-24f8-4f24-ac6e-d927dc4d28f5",
+      "name": "Table and Chairs Dressing"
+    },
+    {
+      "id": "39112d43-48b6-4c21-a72c-3bd3454e5735",
+      "name": "Candles"
+    },
+    {
+      "id": "b8397198-2768-4f88-b493-cbb9fbda042d",
+      "name": "Tableware"
+    },
+    {
+      "id": "af683f1b-4b0f-4ad3-bba6-a21a00b5e578",
+      "name": "Lights"
+    },
+    {
+      "id": "63ed4add-2377-4c9e-a2e1-b3492135c333",
+      "name": "Accreditation & Lanyards"
+    },
+    {
+      "id": "2d2c6992-a07c-4e13-8acd-92ed51532499",
+      "name": "Furniture"
+    },
+    {
+      "id": "b696b228-492b-4a99-8636-4c633501a89b",
+      "name": "Water Station"
+    },
+    {
+      "id": "1aa94e48-d7b7-4903-a770-152a5514a440",
+      "name": "Signage"
+    }
+  ]
+}
