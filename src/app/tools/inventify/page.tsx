@@ -459,6 +459,11 @@ export default function InventifyPage() {
                 <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                   <h2 className="text-sm font-semibold text-zinc-300">{editProduct ? "Edit Product" : "Add Product"}</h2>
                   <div className="mt-3 flex flex-col gap-3">
+                    <select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-300 focus:border-amber-500 focus:outline-none">
+                      <option value="">Select category...</option>
+                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
                     <div className="flex gap-3">
                       <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
                         placeholder="Product description"
@@ -466,11 +471,6 @@ export default function InventifyPage() {
                       <input type="number" value={productForm.totalCount} onChange={(e) => setProductForm({ ...productForm, totalCount: e.target.value })}
                         placeholder="Unit(s)" min="1" className="w-24 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none text-center" />
                     </div>
-                    <select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-300 focus:border-amber-500 focus:outline-none">
-                      <option value="">Select category...</option>
-                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
                     <div className="flex gap-3 items-center">
                       <label className="flex-1 flex items-center gap-2 rounded-lg border border-zinc-700 bg-black px-4 py-2 text-sm text-zinc-400 cursor-pointer hover:border-zinc-500 transition-colors">
                         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
