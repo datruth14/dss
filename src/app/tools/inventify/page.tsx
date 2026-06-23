@@ -583,6 +583,7 @@ export default function InventifyPage() {
                 </div>
               </>
             )}
+            </>)}
 
             {adminView === "users" && (
               <div className="space-y-4">
