@@ -85,8 +85,7 @@ export default function InventifyPage() {
 
   useEffect(() => {
     if (role !== "user") return;
-    const available = getAvailableProducts();
-    const shuffled = [...available].sort(() => Math.random() - 0.5).slice(0, 20);
+    const shuffled = [...products].sort(() => Math.random() - 0.5).slice(0, 10);
     setRandomProducts(shuffled);
   }, [role, db?.products]);
 
