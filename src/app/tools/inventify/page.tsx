@@ -573,10 +573,9 @@ export default function InventifyPage() {
                                   await reloadDb();
                                 }} className="text-xs text-red-400 hover:text-red-300">&times;</button>
                               </div>
-                  ))}
-                </div>
-              );
-            })()}
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </details>
 
@@ -749,6 +748,7 @@ export default function InventifyPage() {
   const myRequests = currentUser ? getUserRequests(currentUser.id) : [];
   const myAssets = currentUser ? getUserAssets(currentUser.id) : [];
   const myAssetsCount = myAssets.length;
+  const browseItems = searchQuery.trim() ? getFilteredProducts() : randomProducts;
 
   return (
     <div className="relative flex min-h-screen flex-col bg-zinc-950">
@@ -825,13 +825,11 @@ export default function InventifyPage() {
               <h2 className="text-sm font-semibold text-zinc-300 mb-3">Available Products</h2>
               <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..." className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none" />
-              {(() => {
-                const q = searchQuery.trim();
-                const items = q ? getFilteredProducts() : randomProducts;
-                if (items.length === 0) return <p className="text-sm text-zinc-500 text-center pt-8">No products found.</p>;
-                return (
+              {browseItems.length === 0 ? (
+                <p className="text-sm text-zinc-500 text-center pt-8">No products found.</p>
+              ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {items.map((p) => (
+                  {browseItems.map((p) => (
                     <div key={p.id} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
                       <div className="aspect-[4/3] bg-zinc-800">
                         {p.image ? <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
